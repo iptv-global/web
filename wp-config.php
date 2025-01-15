@@ -17,7 +17,7 @@
  *
  * @package WordPress
  */
-
+@ini_set( 'max_input_vars' , 5000 );
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define( 'DB_NAME', 'uncover' );
@@ -86,6 +86,8 @@ $table_prefix = 'wp_';
  * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
 define( 'WP_DEBUG', false );
+	
+define( 'WP_MEMORY_LIMIT', '2048M' );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
