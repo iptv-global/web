@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Module Name: Post Custom Layout
  * Description: Add users optionality to change post initial layout.
  *
@@ -10,59 +10,77 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
+require_once vc_manager()->path( 'MUTUAL_MODULES_DIR', 'class-module.php' );
+
 /**
  * Module entry point.
+ *
  * @since 7.7
  */
-class Vc_Post_Custom_Layout_Module
-{
+class Vc_Post_Custom_Layout_Module extends Vc_Module {
 	/**
 	 * Module meta key.
+	 *
 	 * @since 7.7
 	 * @var string
 	 */
-	const CUSTOM_CSS_META_KEY = '_wpb_post_custom_layout';
+	const CUSTOM_LAYOUT_META_KEY = '_wpb_post_custom_layout';
+
+	/**
+	 * Module settings that specify functionality common for some modules.
+	 *
+	 * @note We can use object functionality $this->get_module_functionality( 'post-meta' )->foo();
+	 *
+	 * @since 8.4
+	 * @var array
+	 */
+	public $module_common_functionality = [ 'post-meta' ];
+
+	/**
+	 * Post meta key.
+	 *
+	 * @since 8.4
+	 * @var string
+	 */
+	public $post_meta_key = 'post_custom_layout';
+
+	/**
+	 * Post meta slug.
+	 *
+	 * @since 8.4
+	 * @var string
+	 */
+	public $post_meta_slug = 'custom_layout';
+
 	/**
 	 * Init module implementation.
 	 *
 	 * @since 7.7
 	 */
 	public function init() {
-		add_filter( 'vc_post_meta_list', [$this, 'add_custom_meta_to_update'] );
-
-		add_filter( 'wpb_set_post_custom_meta', [$this, 'set_post_custom_meta'], 10, 1 );
+		// We initialize the common modules functionality in parent constructor.
+		parent::__construct();
 
 		add_action( 'template_include', [ $this, 'switch_post_custom_layout' ], 11 );
+
+		add_filter( 'wpb_is_post_custom_layout_blank', [ $this, 'is_layout_blank' ] );
 	}
 
 	/**
-	 * Add module meta to the plugin post custom meta list.
+	 * Get module post meta.
 	 *
-	 * @since 7.7
-	 * @param array $meta_list
-	 * @return array
-	 */
-	public function add_custom_meta_to_update( $meta_list ) {
-		$meta_list[] = 'custom_layout';
-
-		return $meta_list;
-	}
-
-	/**
-	 * Set post custom meta.
-	 *
-	 * @since 7.7
+	 * @since 8.4
 	 * @param array $post_custom_meta
-	 * @return array
+	 * @param int $post_id
+	 * @return string
 	 */
-	public function set_post_custom_meta( $post_custom_meta ) {
-		$post_custom_meta['post_custom_layout'] = $this->get_custom_layout_name();
-
-		return $post_custom_meta;
+	public function get_module_meta( $post_custom_meta, $post_id ) {
+		return $this->get_custom_layout_name();
 	}
 
 	/**
 	 * Change the path of the current template to our custom layout.
+	 *
 	 * @since 7.7
 	 *
 	 * @param string $template The path of the template to include.
@@ -87,6 +105,7 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Get name of the custom layout.
+	 *
 	 * @note on a plugin core level right now we have only 'blank' layout.
 	 * @since 7.7
 	 *
@@ -111,6 +130,7 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Check if user switched layout in frontend editor.
+	 *
 	 * @note in such cases we should reload the page
 	 * @since 7.7
 	 *
@@ -125,6 +145,7 @@ class Vc_Post_Custom_Layout_Module
 	/**
 	 * For a frontend editor we keep layout as get param
 	 * when we switching it inside editor and show user new layout inside editor.
+	 *
 	 * @since 7.7
 	 *
 	 * @return false|string
@@ -137,6 +158,7 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Retrieve get params.
+	 *
 	 * @description  we should obtain params from $_SERVER['HTTP_REFERER']
 	 * if we try to get params inside iframe and from regular $_GET when outside
 	 * @since 7.7
@@ -148,10 +170,10 @@ class Vc_Post_Custom_Layout_Module
 			return false;
 		}
 
-		// inside iframe
+		// inside iframe.
 		if ( vc_is_page_editable() ) {
 			$params = $this->get_params_from_server_referer();
-			// outside iframe
+			// outside iframe.
 		} else {
             // phpcs:ignore
 			$params = $_GET;
@@ -162,6 +184,7 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Parse $_SERVER['HTTP_REFERER'] and get params from it.
+	 *
 	 * @since 7.7
 	 *
 	 * @return array|false
@@ -177,23 +200,27 @@ class Vc_Post_Custom_Layout_Module
 		}
 
 		$params = [];
-		parse_str( $query,$params );
+		parse_str( $query, $params );
 
 		return $params;
 	}
 
 	/**
 	 * Get previously saved layout from post meta.
+	 *
 	 * @since 7.7
 	 *
 	 * @return mixed
 	 */
 	public function get_layout_from_meta() {
-		return get_post_meta( get_the_ID(), self::CUSTOM_CSS_META_KEY, true );
+		$post_id = wpb_update_id_with_preview_id( get_the_ID() );
+
+		return get_post_meta( $post_id, self::CUSTOM_LAYOUT_META_KEY, true );
 	}
 
 	/**
 	 * Get path of the custom layout.
+	 *
 	 * @note we keep all plugin layouts in include/templates/pages/layouts/ folder.
 	 * @since 7.7
 	 *
@@ -211,6 +238,7 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Get href for the custom layout by layout name.
+	 *
 	 * @since 7.7
 	 *
 	 * @param string $layout_name
@@ -229,16 +257,17 @@ class Vc_Post_Custom_Layout_Module
 
 	/**
 	 * Check if layout active on current location.
+	 *
 	 * @since 7.7
 	 *
 	 * @param string $check_name
-	 * @param string $location settings or welcome
+	 * @param string $location settings or welcome.
 	 * @return bool
 	 */
 	public function check_if_layout_active( $check_name, $location ) {
 		$current_name = $this->get_custom_layout_name();
 
-		if ( $current_name && $current_name == $check_name ) {
+		if ( $current_name && $current_name === $check_name ) {
 			return true;
 		}
 
@@ -247,5 +276,18 @@ class Vc_Post_Custom_Layout_Module
 		}
 
 		return false;
+	}
+
+	/**
+	 * Checks if the layout is 'blank'.
+	 *
+	 * @since 8.2
+	 *
+	 * @return bool
+	 */
+	public function is_layout_blank() {
+		$layout_name = $this->get_custom_layout_name();
+
+		return 'blank' === $layout_name;
 	}
 }

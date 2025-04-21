@@ -61,11 +61,19 @@ class Uncode_Toolkit_Privacy {
 	}
 
 	/**
+	 * Load the required dependencies for this plugin.
+	 */
+	public function include_files() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/legacy/class-uncode-toolkit-privacy-legacy-tools.php';
+	}
+
+	/**
 	 * Admin related hooks
 	 */
 	private function admin_hooks() {
 		$plugin_admin   = new Uncode_Toolkit_Privacy_Admin( $this->get_plugin_name(), $this->get_version() );
 
+		add_action( 'init', array( $this, 'include_files' ) );
 		add_action( 'plugins_loaded', array( $this, 'set_locale' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $plugin_admin, 'enqueue_scripts' ) );

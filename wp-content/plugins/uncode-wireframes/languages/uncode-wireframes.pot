@@ -1,4 +1,4 @@
-# Copyright (C) 2024 Uncode Wireframes
+# Copyright (C) 2025 Uncode Wireframes
 # This file is distributed under the same license as the Uncode Wireframes package.
 msgid ""
 msgstr ""
@@ -112,66 +112,70 @@ msgid "Patterns"
 msgstr ""
 
 #: ../includes/core-functions.php:62
-msgid "Counters"
+msgid "Cards"
 msgstr ""
 
 #: ../includes/core-functions.php:63
-msgid "Pricing Tables"
-msgstr ""
-
-#: ../includes/core-functions.php:64
-msgid "Tabs Accordions"
-msgstr ""
-
-#: ../includes/core-functions.php:65
-msgid "Forms"
-msgstr ""
-
-#: ../includes/core-functions.php:66
-msgid "Maps"
-msgstr ""
-
-#: ../includes/core-functions.php:67
-msgid "Team Members"
-msgstr ""
-
-#: ../includes/core-functions.php:68
-msgid "Quotes"
-msgstr ""
-
-#: ../includes/core-functions.php:69
 msgid "Shop"
 msgstr ""
 
-#: ../includes/core-functions.php:70
+#: ../includes/core-functions.php:64
 msgid "Products"
 msgstr ""
 
-#: ../includes/core-functions.php:71
+#: ../includes/core-functions.php:65
 msgid "Cart & Checkout"
 msgstr ""
 
-#: ../includes/core-functions.php:72
+#: ../includes/core-functions.php:66
 msgid "Shop Utilities"
 msgstr ""
 
+#: ../includes/core-functions.php:67
+msgid "Counters"
+msgstr ""
+
+#: ../includes/core-functions.php:68
+msgid "Pricing Tables"
+msgstr ""
+
+#: ../includes/core-functions.php:69
+msgid "Tabs Accordions"
+msgstr ""
+
+#: ../includes/core-functions.php:70
+msgid "Forms"
+msgstr ""
+
+#: ../includes/core-functions.php:71
+msgid "Maps"
+msgstr ""
+
+#: ../includes/core-functions.php:72
+msgid "Team Members"
+msgstr ""
+
 #: ../includes/core-functions.php:73
-msgid "Special"
+msgid "Quotes"
 msgstr ""
 
 #: ../includes/core-functions.php:74
-msgid "Navigation"
+msgid "Special"
 msgstr ""
 
 #: ../includes/core-functions.php:75
-msgid "Carousel Navigation"
+msgid "Navigation"
 msgstr ""
 
 #: ../includes/core-functions.php:76
-msgid "Footers"
+msgid "Carousel Navigation"
 msgstr ""
 
 #: ../includes/core-functions.php:77
+msgid "Footers"
+msgstr ""
+
+#: ../includes/core-functions.php:78
 msgid "Popups"
 msgstr ""
 
@@ -493,6 +497,38 @@ msgstr ""
 
 #: ../includes/wireframes/call-to-action/Call-To-Action-Split-Fullscreen.php:21
 msgid "Call To Action Split Fullscreen"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Eight.php:22
+msgid "Cards Stacked Eight"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Five.php:22
+msgid "Cards Stacked Five"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Four.php:22
+msgid "Cards Stacked Four"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-One.php:22
+msgid "Cards Stacked One"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Seven.php:22
+msgid "Cards Stacked Seven"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Six.php:22
+msgid "Cards Stacked Six"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Three.php:22
+msgid "Cards Stacked Three"
+msgstr ""
+
+#: ../includes/wireframes/cards/Cards-Stacked-Two.php:22
+msgid "Cards Stacked Two"
 msgstr ""
 
 #: ../includes/wireframes/carousel-navigation/Carousel-Nav-Absolute-Center.php:21
@@ -947,6 +983,10 @@ msgstr ""
 msgid "Content Justify with Video Wide"
 msgstr ""
 
+#: ../includes/wireframes/contents/Content-List-Services.php:22
+msgid "Content List Services"
+msgstr ""
+
 #: ../includes/wireframes/contents/Content-Media-Off-Grid.php:21
 msgid "Content Media Off-Grid"
 msgstr ""
@@ -1111,6 +1151,10 @@ msgstr ""
 msgid "Content Vertical Justify Wide"
 msgstr ""
 
+#: ../includes/wireframes/contents/Content-Video-Enlarge.php:22
+msgid "Content Video Enlarge"
+msgstr ""
+
 #: ../includes/wireframes/contents/Content-Wide-Justify.php:21
 msgid "Content Wide Justify"
 msgstr ""
@@ -1177,6 +1221,10 @@ msgstr ""
 
 #: ../includes/wireframes/counters/Counter-Heading.php:21
 msgid "Counter Heading"
+msgstr ""
+
+#: ../includes/wireframes/counters/Counter-Innovators.php:22
+msgid "Counter Innovators"
 msgstr ""
 
 #: ../includes/wireframes/counters/Counter-Left.php:21
@@ -1263,6 +1311,10 @@ msgstr ""
 msgid "Footer Classic Hotel"
 msgstr ""
 
+#: ../includes/wireframes/footers/Footer-Classic-Innovators.php:22
+msgid "Footer Classic Innovators"
+msgstr ""
+
 #: ../includes/wireframes/footers/Footer-Classic-Lottie.php:21
 msgid "Footer Classic Lottie"
 msgstr ""
@@ -1307,6 +1359,10 @@ msgstr ""
 msgid "Footer Creative Freelance"
 msgstr ""
 
+#: ../includes/wireframes/footers/Footer-Creative-Hub.php:22
+msgid "Footer Creative Hub"
+msgstr ""
+
 #: ../includes/wireframes/footers/Footer-Creative-Marketing.php:21
 msgid "Footer Creative Marketing"
 msgstr ""
@@ -1317,6 +1373,10 @@ msgstr ""
 
 #: ../includes/wireframes/footers/Footer-Creative-Product.php:21
 msgid "Footer Creative Product"
+msgstr ""
+
+#: ../includes/wireframes/footers/Footer-Creative-Prototype.php:22
+msgid "Footer Creative Prototype"
 msgstr ""
 
 #: ../includes/wireframes/footers/Footer-Creative-Studio.php:21
@@ -1559,6 +1619,10 @@ msgstr ""
 msgid "Gallery Masonry"
 msgstr ""
 
+#: ../includes/wireframes/galleries/Gallery-Prototype.php:22
+msgid "Gallery Prototype"
+msgstr ""
+
 #: ../includes/wireframes/galleries/Gallery-Simple.php:21
 msgid "Gallery Simple"
 msgstr ""
@@ -1617,6 +1681,10 @@ msgstr ""
 
 #: ../includes/wireframes/grids/Grid-Bento-Creative.php:21
 msgid "Grid Bento Creative"
+msgstr ""
+
+#: ../includes/wireframes/grids/Grid-Bento-Innovators.php:22
+msgid "Grid Bento Innovators"
 msgstr ""
 
 #: ../includes/wireframes/grids/Grid-Bento-Rows.php:21
@@ -1721,6 +1789,10 @@ msgstr ""
 
 #: ../includes/wireframes/headers/Header-Classic-Hotel.php:21
 msgid "Header Classic Hotel"
+msgstr ""
+
+#: ../includes/wireframes/headers/Header-Classic-Innovators.php:22
+msgid "Header Classic Innovators"
 msgstr ""
 
 #: ../includes/wireframes/headers/Header-Classic-Landing.php:21
@@ -1841,6 +1913,10 @@ msgstr ""
 
 #: ../includes/wireframes/headers/Header-Portfolio-Cards.php:21
 msgid "Header Portfolio Cards"
+msgstr ""
+
+#: ../includes/wireframes/headers/Header-Portfolio-Design-Studio.php:22
+msgid "Header Portfolio Design Studio"
 msgstr ""
 
 #: ../includes/wireframes/headers/Header-Portfolio-Developer.php:21
@@ -2127,6 +2203,10 @@ msgstr ""
 msgid "News Carousel Start-Up"
 msgstr ""
 
+#: ../includes/wireframes/news/News-Classic-Innovators.php:22
+msgid "News Classic Innovators"
+msgstr ""
+
 #: ../includes/wireframes/news/News-Consultants.php:21
 msgid "News Consultants"
 msgstr ""
@@ -2247,6 +2327,10 @@ msgstr ""
 msgid "News Single Fullwidth"
 msgstr ""
 
+#: ../includes/wireframes/news/News-Stacked.php:22
+msgid "News Stacked"
+msgstr ""
+
 #: ../includes/wireframes/news/News-Sticky-Wide-Alt.php:21
 msgid "News Sticky Wide Alt"
 msgstr ""
@@ -2297,6 +2381,10 @@ msgstr ""
 
 #: ../includes/wireframes/news/News-with-Focus.php:21
 msgid "News with Focus"
+msgstr ""
+
+#: ../includes/wireframes/news/Shop-Stacked.php:22
+msgid "Shop Stacked"
 msgstr ""
 
 #: ../includes/wireframes/patterns/Pattern-Grid-Eight.php:21

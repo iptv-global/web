@@ -847,7 +847,7 @@ class RevSliderOutput extends RevSliderFunctions {
 				$this->add_slider_transient($transient, $content);
 			}
 			
-			echo $content;
+			echo apply_filters('revslider_html_v6_output', $content, $this);
 		}catch(Exception $e){
 			$message = $e->getMessage();
 			

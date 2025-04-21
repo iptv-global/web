@@ -875,22 +875,6 @@ function uncode_vc_render_field( $output, $param, $value, $settings, $atts ) {
 	$output_label_toggle = ( isset( $param['description'] ) ) ? '<span class="toggle-description"></span>' : '';
 	$output .= ( isset( $param['heading'] ) ) ? '<div class="wpb_element_label"><span class="wpb_element_label_inner">' . $param['heading'] . $output_label_toggle . '</span>' . $output_in_label . '</div>' : '';
 	$output .= '<div class="edit_form_line">';
-	if (class_exists('Vc_Edit_Form_Fields')) {
-		$tag = vc_post_param( 'tag' );
-		vc_user_access()->checkAdminNonce()->validateDie( esc_html__( 'Access denied', 'js_composer' ) )->wpAny( array(
-			'edit_post',
-			(int) vc_request_param( 'post_id' ),
-		) )->validateDie( esc_html__( 'Access denied', 'js_composer' ) )->check( 'vc_user_access_check_shortcode_edit', $tag )->validateDie( esc_html__( 'Access denied', 'js_composer' ) );
-	
-		$params = (array) stripslashes_deep( vc_post_param( 'params' ) );
-		$params = array_map( 'vc_htmlspecialchars_decode_deep', $params );
-	
-		require_once vc_path_dir( 'EDITORS_DIR', 'class-vc-edit-form-fields.php' );
-		$fields = new Vc_Edit_Form_Fields( $tag, $params );
-		if ( method_exists($fields, 'renderAiIcon') ) {
-			$output .= $fields->renderAiIcon( $param );
-		}
-	}
 	$value = apply_filters( 'vc_form_fields_render_field_' . $base . '_' . $param['param_name'] . '_param_value', $value, $param, $settings, $atts );
 	$param = apply_filters( 'vc_form_fields_render_field_' . $base . '_' . $param['param_name'] . '_param', $param, $value, $settings, $atts );
 	$output = apply_filters( 'vc_edit_form_fields_render_field_' . $param['type'] . '_before', $output );

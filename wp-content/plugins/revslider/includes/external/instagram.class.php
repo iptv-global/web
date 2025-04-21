@@ -163,8 +163,7 @@ class RevSliderInstagram extends RevSliderFunctions {
 		}
 
 		// save token transient to trigger refresh on expire
-		$transient_token = $this->get_transient_name('token', $token);
-		set_transient($transient_token, $token, $this->transient_token_sec);
+		set_transient( $this->get_transient_name('token', $token), $token, $this->transient_token_sec);
 
 		$slider->set_param(array('source', 'instagram', 'token_source'), 'account');
 		$slider->set_param(array('source', 'instagram', 'token'), $token);
@@ -172,7 +171,7 @@ class RevSliderInstagram extends RevSliderFunctions {
 		$slider->update_params(array());
 
 		//redirect
-		$url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+		$url = sanitize_url( set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ) );
 		$url = add_query_arg(array(self::QUERY_TOKEN => false, 'rs_ig_nonce' => false, self::QUERY_SHOW => 1), $url);
 		wp_redirect($url);
 		exit();
@@ -193,8 +192,8 @@ class RevSliderInstagram extends RevSliderFunctions {
 	}
 
 	public static function get_login_url(){
-		$id = (isset($_GET['id'])) ? $_GET['id'] : '';
-		$alias = (isset($_GET['alias'])) ? $_GET['alias'] : '';
+		$id = (isset($_GET['id'])) ? intval( $_GET['id'] ) : '';
+		$alias = (isset($_GET['alias'])) ? sanitize_text_field( $_GET['alias'] ) : '';
 		if (!empty($id)) {
 			$link = self::URL_IG_AUTH . '?state=' . base64_encode(admin_url('admin.php?page=revslider&view=slide&id='.$id.'&rs_ig_nonce='.wp_create_nonce(self::get_nonce_name($id))));
 		} else if (!empty($alias)) {

@@ -61,3 +61,71 @@ function ls_normalize_hide_layer_value( $value = false ) {
 
 	return $value ? 'all' : false;
 }
+
+function ls_apply_affix_properties( $layerProps, &$innerAttributes, $sliderID ) {
+
+	$styles = [];
+	$wpml_string_base = "slider-{$sliderID}-layer-{$layerProps['uuid']}";
+
+	if( ! empty( $layerProps['affixBefore'] ) ) {
+
+		if( has_filter( 'wpml_translate_single_string' ) && get_option('ls_wpml_string_translation', true ) ) {
+			$layerProps['affixBefore'] = apply_filters( 'wpml_translate_single_string', $layerProps['affixBefore'], 'LayerSlider Sliders', $wpml_string_base.'-affix-before' );
+		}
+
+		$innerAttributes['data-prefix'] = do_shortcode( __( stripslashes( $layerProps['affixBefore'] ) ) );
+	}
+
+	if( ! empty( $layerProps['affixAfter'] ) ) {
+
+		if( has_filter( 'wpml_translate_single_string' ) && get_option('ls_wpml_string_translation', true ) ) {
+			$layerProps['affixAfter'] = apply_filters( 'wpml_translate_single_string', $layerProps['affixAfter'], 'LayerSlider Sliders', $wpml_string_base.'-affix-after' );
+		}
+
+		$innerAttributes['data-suffix'] = do_shortcode( __( stripslashes( $layerProps['affixAfter'] ) ) );
+	}
+
+	if( ! empty( $layerProps['affixFloat'] ) ) {
+		$innerAttributes['class'] .=  ' ls-affix-float';
+	}
+
+	if( ! empty( $layerProps['affixNewLine'] ) ) {
+		$styles['--ls-affix-nl'] = 'block';
+	}
+
+	if( ! empty( $layerProps['affixColor'] ) ) {
+		$styles['--ls-affix-color'] = $layerProps['affixColor'];
+	}
+
+	if( ! empty( $layerProps['affixFontSize'] ) ) {
+		$styles['--ls-affix-fs'] = $layerProps['affixFontSize'].'em';
+	}
+
+	if( ! empty( $layerProps['affixFontFamily'] ) ) {
+		$styles['--ls-affix-ff'] = $layerProps['affixFontFamily'];
+	}
+
+	if( ! empty( $layerProps['affixFontWeight'] ) ) {
+		$styles['--ls-affix-fw'] = $layerProps['affixFontWeight'];
+	}
+
+	if( ! empty( $layerProps['affixHA'] ) ) {
+		$styles['--ls-affix-ha'] = $layerProps['affixHA'].'em';
+	}
+
+	if( ! empty( $layerProps['affixVA'] ) ) {
+		$styles['--ls-affix-va'] = $layerProps['affixVA'].'em';
+	}
+
+	$innerAttributes['style'] .= ls_array_to_attr( $styles, 'css' );
+}
+
+function ls_get_decimal_places( $number ) {
+
+	if( ! is_numeric( $number ) ) {
+        return 0;
+    }
+
+    $parts = explode( '.', (string) $number );
+    return isset( $parts[1] ) ? strlen( $parts[1] ) : 0;
+}

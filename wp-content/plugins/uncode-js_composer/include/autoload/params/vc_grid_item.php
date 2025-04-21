@@ -1,17 +1,25 @@
 <?php
+/**
+ * Autoload hooks related grids
+ *
+ * @note we require our autoload files everytime and everywhere after plugin load.
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
 /**
- * @param $settings
- * @param $value
+ * Output for grid item form field.
+ *
+ * @param array $settings
+ * @param int $value
  * @return string
  */
 function vc_vc_grid_item_form_field( $settings, $value ) {
 	require_once vc_path_dir( 'PARAMS_DIR', 'vc_grid_item/editor/class-vc-grid-item-editor.php' );
 	require_once vc_path_dir( 'PARAMS_DIR', 'vc_grid_item/class-vc-grid-item.php' );
-	$output = '<div data-vc-grid-element="container">' . '<select data-vc-grid-element="value" type="hidden" name="' . esc_attr( $settings['param_name'] ) . '" class="wpb_vc_param_value wpb-select ' . esc_attr( $settings['param_name'] ) . ' ' . esc_attr( $settings['type'] ) . '_field" ' . '>';
+	$output = '<div data-vc-grid-element="container"><select data-vc-grid-element="value" type="hidden" name="' . esc_attr( $settings['param_name'] ) . '" class="wpb_vc_param_value wpb-select ' . esc_attr( $settings['param_name'] ) . ' ' . esc_attr( $settings['type'] ) . '_field">';
 	$vc_grid_item_templates = Vc_Grid_Item::predefinedTemplates();
 	if ( is_array( $vc_grid_item_templates ) ) {
 		foreach ( $vc_grid_item_templates as $key => $data ) {
@@ -19,11 +27,11 @@ function vc_vc_grid_item_form_field( $settings, $value ) {
 		}
 	}
 
-	$grid_item_posts = get_posts( array(
+	$grid_item_posts = get_posts( [
 		'posts_per_page' => '-1',
 		'orderby' => 'post_title',
 		'post_type' => Vc_Grid_Item_Editor::postType(),
-	) );
+	] );
 	foreach ( $grid_item_posts as $post ) {
 		$output .= '<option  data-vc-link="' . esc_url( get_edit_post_link( $post->ID ) ) . '"value="' . esc_attr( $post->ID ) . '"' . ( (string) $post->ID === $value ? ' selected="true"' : '' ) . '>' . esc_html( _draft_or_post_title( $post ) ) . '</option>';
 	}
@@ -32,13 +40,18 @@ function vc_vc_grid_item_form_field( $settings, $value ) {
 	return $output;
 }
 
+/**
+ * Load vc_grid_item param
+ */
 function vc_load_vc_grid_item_param() {
 	vc_add_shortcode_param( 'vc_grid_item', 'vc_vc_grid_item_form_field' );
 }
 
 add_action( 'vc_load_default_params', 'vc_load_vc_grid_item_param' );
 /**
- * @param $target
+ * Add target attribute to link.
+ *
+ * @param string $target
  * @return string
  */
 function vc_gitem_post_data_get_link_target_frontend_editor( $target ) {
@@ -46,7 +59,9 @@ function vc_gitem_post_data_get_link_target_frontend_editor( $target ) {
 }
 
 /**
- * @param $rel
+ * Add rel attribute to link.
+ *
+ * @param string $rel
  * @return string
  */
 function vc_gitem_post_data_get_link_rel_frontend_editor( $rel ) {
@@ -54,7 +69,9 @@ function vc_gitem_post_data_get_link_rel_frontend_editor( $rel ) {
 }
 
 /**
- * @param $atts
+ * Create link.
+ *
+ * @param array $atts
  * @param string $default_class
  * @param string $title
  * @return string
@@ -112,8 +129,10 @@ function vc_gitem_create_link( $atts, $default_class = '', $title = '' ) {
 }
 
 /**
- * @param $atts
- * @param $post
+ * Create real link.
+ *
+ * @param array $atts
+ * @param WP_Post $post
  * @param string $default_class
  * @param string $title
  * @return string
@@ -150,30 +169,30 @@ function vc_gitem_create_link_real( $atts, $post, $default_class = '', $title = 
 			}
 		} elseif ( 'image' === $atts['link'] ) {
 			$target = isset( $atts['link_target'] ) && $atts['link_target'] ? ' target="_blank"' : '';
-			$href_link = vc_gitem_template_attribute_post_image_url( '', array(
+			$href_link = vc_gitem_template_attribute_post_image_url( '', [
 				'post' => $post,
 				'data' => '',
-			) );
+			] );
 			$link = 'a href="' . esc_url( $href_link ) . '" class="' . esc_attr( $link_css_class ) . '"' . $target;
 		} elseif ( 'image_lightbox' === $atts['link'] ) {
 			$target = isset( $atts['link_target'] ) && $atts['link_target'] ? ' target="_blank"' : '';
-			$link = 'a' . vc_gitem_template_attribute_post_image_url_attr_lightbox( '', array(
+			$link = 'a' . vc_gitem_template_attribute_post_image_url_attr_lightbox( '', [
 				'post' => $post,
 				'data' => esc_attr( $link_css_class ),
-			) ) . $target;
+			] ) . $target;
 		} elseif ( 'image_full' === $atts['link'] ) {
 			$target = isset( $atts['link_target'] ) && $atts['link_target'] ? ' target="_blank"' : '';
-			$href_link = vc_gitem_template_attribute_post_full_image_url( '', array(
+			$href_link = vc_gitem_template_attribute_post_full_image_url( '', [
 				'post' => $post,
 				'data' => '',
-			) );
+			] );
 			$link = 'a href="' . esc_url( $href_link ) . '" class="' . esc_attr( $link_css_class ) . '"' . $target;
 		} elseif ( 'image_full_lightbox' === $atts['link'] ) {
 			$target = isset( $atts['link_target'] ) && $atts['link_target'] ? ' target="_blank"' : '';
-			$link = 'a' . vc_gitem_template_attribute_post_full_image_url_attr_lightbox( '', array(
+			$link = 'a' . vc_gitem_template_attribute_post_full_image_url_attr_lightbox( '', [
 				'post' => $post,
 				'data' => esc_attr( $link_css_class ),
-			) ) . $target;
+			] ) . $target;
 		}
 	}
 	if ( strlen( $title ) > 0 ) {
@@ -184,7 +203,9 @@ function vc_gitem_create_link_real( $atts, $post, $default_class = '', $title = 
 }
 
 /**
- * @param $link
+ * Get link.
+ *
+ * @param string $link
  * @return string
  */
 function vc_gitem_post_data_get_link_link_frontend_editor( $link ) {

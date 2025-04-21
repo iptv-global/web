@@ -1,4 +1,10 @@
 <?php
+/**
+ * Seo settings for individual posts.
+ *
+ * @since 7.4
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -11,12 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Vc_Post_Seo {
 
 	/**
+	 * Editor instance.
+	 *
 	 * @since 7.4
 	 * @var Vc_Editor
 	 */
 	protected $editor;
 
 	/**
+	 * Class constructor.
+	 *
 	 * @since 7.4
 	 * @param Vc_Editor $editor
 	 */
@@ -25,6 +35,8 @@ class Vc_Post_Seo {
 	}
 
 	/**
+	 * Get editor instance.
+	 *
 	 * @since 7.4
 	 * @return Vc_Editor
 	 */
@@ -34,6 +46,7 @@ class Vc_Post_Seo {
 
 	/**
 	 * Render popup template.
+	 *
 	 * @since 7.4
 	 */
 	public function render_ui_template() {
@@ -47,18 +60,10 @@ class Vc_Post_Seo {
 				'box' => $this,
 				'can_unfiltered_html_cap' =>
 					vc_user_access()->part( 'unfiltered_html' )->checkStateAny( true, null )->get(),
-				'template_variables' => [
-					'categories' => [
-						esc_html__( 'General', 'js_composer' ),
-						esc_html__( 'Content Analysis', 'js_composer' ),
-						esc_html__( 'Social', 'js_composer' ),
-					],
+				'header_tabs_template_variables' => [
+					'categories' => $this->get_categories(),
 					'is_default_tab' => true,
-					'templates' => [
-						'editors/popups/seo/seo-general-tab.tpl.php',
-						'editors/popups/seo/seo-analysis-tab.tpl.php',
-						'editors/popups/seo/seo-social-tab.tpl.php',
-					],
+					'templates' => $this->get_tabs_templates(),
 				],
 				'post' => $post,
 				'post_id' => $post_id,
@@ -133,5 +138,58 @@ class Vc_Post_Seo {
 		}
 
 		return $image[0];
+	}
+
+	/**
+	 * Get modal popup template tabs.
+	 *
+	 * @param array $categories
+	 *
+	 * @since 8.1
+	 * @return array
+	 */
+	public function get_tabs( $categories ) {
+
+		$tabs = [];
+
+		foreach ( $categories as $key => $name ) {
+			$filter = '.js-category-' . md5( $name );
+
+			$tabs[] = [
+				'name' => $name,
+				'filter' => $filter,
+				'active' => 0 === $key,
+			];
+		}
+
+		return $tabs;
+	}
+
+	/**
+	 * Get tab categories.
+	 *
+	 * @sinse 8.1
+	 * @return array
+	 */
+	public function get_categories() {
+		return [
+			esc_html__( 'General', 'js_composer' ),
+			esc_html__( 'Content Analysis', 'js_composer' ),
+			esc_html__( 'Social', 'js_composer' ),
+		];
+	}
+
+	/**
+	 * Get tabs templates.
+	 *
+	 * @since 8.1
+	 * @return array
+	 */
+	public function get_tabs_templates() {
+		return [
+			'editors/popups/seo/seo-general-tab.tpl.php',
+			'editors/popups/seo/seo-analysis-tab.tpl.php',
+			'editors/popups/seo/seo-social-tab.tpl.php',
+		];
 	}
 }

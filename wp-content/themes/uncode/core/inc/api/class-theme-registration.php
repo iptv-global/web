@@ -236,6 +236,7 @@ class Uncode_Theme_Registration {
 	 * Check the purchase code and show a notice.
 	 */
 	public function show_notices() {
+		return;
 		$is_valid_purchase_code = uncode_check_valid_purchase_code();
 		$fo8l_op = uncode_9iol_er();
 

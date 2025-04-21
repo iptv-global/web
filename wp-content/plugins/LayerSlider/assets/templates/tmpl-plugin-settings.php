@@ -324,6 +324,12 @@ $googleFonts = get_option( 'ls-google-fonts', [] );
 						</tr>
 
 						<tr>
+							<td><?= __('Fix 3rd party optimizer issues', 'LayerSlider') ?></td>
+							<td><?= lsGetSwitchOptionField('fix_optimizer_issues', true ) ?></td>
+							<td><?= __('This setting resolves conflicts caused by third-party optimizer plugins that may apply incorrect optimizations to scripts, such as adding the defer attribute to critical scripts. Enabling this option helps ensure proper script loading and improves site stability.', 'LayerSlider') ?></td>
+						</tr>
+
+						<tr>
 							<td><?= __('No-conflict mode', 'LayerSlider') ?></td>
 							<td><?= lsGetSwitchOptionField('admin_no_conflict_mode', false, [ 'data-warning-enable' => __('Do not enable this option unless you’re experiencing issues on LayerSlider’s admin screens. This option can be helpful in some cases but can easily cause other issues and side effects. Do you want to proceed?', 'LayerSlider') ]) ?></td>
 							<td><?= __('Removes extraneous scripts and styles on LayerSlider admin pages to reduce conflicts with 3rd party plugins and themes. Disable this option if you experience any issue.', 'LayerSlider') ?></td>

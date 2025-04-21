@@ -263,6 +263,7 @@ add_action('init', function() {
 		add_action('wp_ajax_ls_get_taxonomies', 'ls_get_taxonomies');
 		add_action('wp_ajax_ls_upload_from_url', 'ls_upload_from_url');
 		add_action('wp_ajax_ls_store_opened', 'ls_store_opened');
+		add_action('wp_ajax_ls_addons_opened', 'ls_addons_opened');
 		add_action('wp_ajax_ls_create_slider_group', 'ls_create_slider_group');
 		add_action('wp_ajax_ls_add_slider_to_group', 'ls_add_slider_to_group');
 		add_action('wp_ajax_ls_rename_slider_group', 'ls_rename_slider_group');
@@ -445,7 +446,17 @@ function ls_delete_slider_group() {
 
 // Template store last viewed
 function ls_store_opened() {
-	update_user_meta(get_current_user_id(), 'ls-store-last-viewed', date('Y-m-d'));
+	update_user_meta( get_current_user_id(), 'ls-store-last-viewed', date('Y-m-d'));
+	exit;
+}
+
+function ls_addons_opened() {
+
+	if( ! wp_verify_nonce( $_GET['nonce'], 'ls-dashboard-nonce') ) {
+		die( json_encode( [ 'success' => false ] ) );
+	}
+
+	update_user_meta( get_current_user_id(), 'ls-addons-last-version', LS_ADDONS_VERSION );
 	exit;
 }
 
@@ -656,6 +667,7 @@ function ls_save_plugin_settings() {
 		// Troubleshooting
 		'clear_3rd_party_caches',
 		'admin_no_conflict_mode',
+		'fix_optimizer_issues',
 		'rocketscript_ignore',
 		'load_all_js_files',
 		'gsap_sandboxing',
@@ -1210,11 +1222,11 @@ function ls_import_online() {
 
 	$name 			= $_GET['name'];
 	$slider 		= urlencode( $_GET['slider'] );
-	$category 	= ! empty( $_GET['category'] ) ? urlencode( $_GET['category'] ) : '';
+	$category 		= ! empty( $_GET['category'] ) ? urlencode( $_GET['category'] ) : '';
 	$remoteURL 		= LS_REPO_BASE_URL.'sliders/download.php?slider='.$slider.'&collection='.$category;
-
-	$uploads 		= wp_upload_dir();
-	$downloadPath 	= $uploads['basedir'].'/lsimport.zip';
+	$fileName 		= sanitize_file_name( $slider );
+	$tmpFolder 		= LS_FileSystem::createUniqueTmpFolder( $fileName.'_zip' );
+	$downloadPath 	= $tmpFolder . '/'.$fileName.'.zip';
 
 	// Download package
 	$zip 			= $GLOBALS['LS_AutoUpdate']->sendApiRequest( $remoteURL );
@@ -1277,7 +1289,8 @@ function ls_import_online() {
 	$sliderCount = (int)$import->sliderCount;
 
 	// Remove package
-	unlink( $downloadPath );
+	LS_FileSystem::deleteDir( $tmpFolder );
+	LS_FileSystem::cleanupTmpFiles();
 
 	$url = admin_url('admin.php?page=layerslider&action=edit&id='.$id);
 
@@ -1771,10 +1784,6 @@ function layerslider_register_wpml_strings( $sliderID, $data ) {
 			if(!empty($slide['sublayers']) && is_array($slide['sublayers'])) {
 				foreach($slide['sublayers'] as $layerIndex => $layer) {
 
-					if( empty( $layer['html'] ) ) {
-						continue;
-					}
-
 					if( ! empty( $layer['media'] ) && $layer['media'] === 'img' ) {
 						continue;
 					}
@@ -1784,11 +1793,22 @@ function layerslider_register_wpml_strings( $sliderID, $data ) {
 					// new WPML implementation, so no version comparison required.
 					if( ! empty( $layer['uuid'] ) && ! empty( $data['properties']['createdWith'] ) ) {
 
-						$string_name = "slider-{$sliderID}-layer-{$layer['uuid']}-html";
-						do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name, $layer['html'], false, $currentLang );
+						$string_name = "slider-{$sliderID}-layer-{$layer['uuid']}";
+
+						if( ! empty( $layer['html'] ) ) {
+							do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-html', $layer['html'], false, $currentLang );
+						}
+
+						if( ! empty( $layer['affixBefore'] ) ) {
+							do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-affix-before', $layer['affixBefore'], false, $currentLang );
+						}
+
+						if( ! empty( $layer['affixAfter'] ) ) {
+							do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-affix-after', $layer['affixAfter'], false, $currentLang );
+						}
 
 					// Old implementation
-					} else {
+					} elseif( ! empty( $layer['html'] ) ) {
 
 						$string_name = '<'.$layer['type'].':'.substr(sha1($layer['html']), 0, 10).'> layer on slide #'.($slideIndex+1).' in slider #'.$sliderID.'';
 						do_action( 'wpml_register_single_string', 'LayerSlider WP', $string_name, $layer['html'], false, $currentLang );

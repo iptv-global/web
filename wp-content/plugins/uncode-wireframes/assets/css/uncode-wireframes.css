@@ -8,6 +8,10 @@
   z-index: 9999999;
 }
 
+#vc_ui-panel-templates .vc_ui-panel-header-container .vc_ui-panel-header .vc_ui-panel-header-controls {
+  padding: 8px 21px 9px 18px;
+}
+
 .vc_edit-form-tab[data-tab="default_templates"] {
   padding-top: 0;
 }

@@ -1,8 +1,11 @@
 @import "./lib/vc_ui-icon-ai.less";
+@wpb-icon-color: #5e5e5e;
+@wpb-icon-hover-color: #0772CE;
 
 // Modal
 .vc_modal-ai-container--promo .vc_modal-popup-content {
     max-height: 550px;
+    margin: auto;
 }
 
 .vc-modal.vc_modal-ai {
@@ -11,7 +14,7 @@
 
 .vc_ui-helper-modal-ai-preloader {
     position: absolute;
-    top: 75px;
+    top: 51px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -52,10 +55,14 @@
     overflow: hidden;
 }
 
+.vc_ui-helper-popup-promo.wpb-generating-content {
+    top: 75px;
+}
+
 // Messages
 #vc_ui-helper-modal-ai .vc_message {
     position: absolute;
-    top: 50px;
+    top: 76px; // the height of the modal header
     margin: 0;
     padding: 10px;
 }
@@ -77,13 +84,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #5E5E5E;
+    color: @wpb-icon-color;
     font-size: 19px;
     cursor: pointer;
     transition: 0.2s color ease-in-out;
 
     &:hover {
-        color: #0772CE;
+        color: @wpb-icon-hover-color;
     }
 
     span {
@@ -109,6 +116,24 @@
     .vc_ui-ai-promo, .vc_heading, .vc_description, .vc_ui-button {
         margin: 0;
     }
+}
+
+.wpb-copy-output {
+  margin-left: auto;
+  cursor: pointer;
+  transition: color .2s ease-in-out;
+
+  &:hover {
+    color: @wpb-icon-hover-color;
+  }
+
+  &.disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    &:hover {
+      color: @wpb-icon-color;
+    }
+  }
 }
 
 @media (min-width: 1200px) {

@@ -327,6 +327,8 @@ class RevSliderFunctions extends RevSliderData {
 	 * before: RevSliderFunctionsWP::getUrlAttachmentImage();
 	 */
 	public function get_url_attachment_image($id, $size = 'full'){
+		require_once(ABSPATH . 'wp-load.php');
+		require_once(ABSPATH . 'wp-includes/pluggable.php');
 		$image	= wp_get_attachment_image_src($id, $size);
 		$url	= (empty($image)) ? false : $this->get_val($image, 0);
 		if($url === false) $url = wp_get_attachment_url($id);
@@ -413,10 +415,9 @@ class RevSliderFunctions extends RevSliderData {
 	public function check_valid_image($url){
 		if(empty($url)) return false;
 
-		$ext		= strtolower(pathinfo($url, PATHINFO_EXTENSION));
-		$img_exts	= array('gif', 'jpg', 'jpeg', 'png');
-
-		return (in_array($ext, $img_exts)) ? $url : false;
+		$ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+		
+		return (in_array($ext, ['gif', 'jpg', 'jpeg', 'png', 'webp'])) ? $url : false;
 	}
 	
 	/**
@@ -941,6 +942,8 @@ class RevSliderFunctions extends RevSliderData {
 		}
 
 		if(!empty($SR_GLOBALS['fonts']['queue'])){
+			$this->remove_wordpress_global_fonts();
+
 			$font_types = array('normal', 'italic');
 			
 			foreach($SR_GLOBALS['fonts']['queue'] as $f_n => $f_s){
@@ -1076,6 +1079,8 @@ class RevSliderFunctions extends RevSliderData {
 		if($fdl === 'disable') return $ret;
 		
 		if(!empty($SR_GLOBALS['fonts']['queue'])){
+			$this->remove_wordpress_global_fonts();
+
 			foreach($SR_GLOBALS['fonts']['queue'] as $f_n => $f_s){
 				if(empty($f_n)) continue;
 				if(isset($f_s['url']) && !empty($f_s['url'])) continue; //ignore custom
@@ -1146,6 +1151,71 @@ class RevSliderFunctions extends RevSliderData {
 		}
 		
 		return apply_filters('revslider_printCleanFontImport', $ret);
+	}
+
+	/**
+	 * removes fonts from queue, that are already loaded by WordPress
+	 */
+	public function remove_wordpress_global_fonts(){
+		global $SR_GLOBALS;
+
+		if(!class_exists('WP_Font_Face_Resolver')) return;
+		if(!method_exists('WP_Font_Face_Resolver', 'get_fonts_from_theme_json' )) return;
+		if(!method_exists('WP_Font_Face_Resolver', 'get_fonts_from_style_variations' )) return;
+
+		$wp_font_list = [];
+		$wp_fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		if(empty($wp_fonts)) $wp_fonts = WP_Font_Face_Resolver::get_fonts_from_style_variations();
+		foreach($wp_fonts ?? [] as $wp_font){
+			foreach($wp_font ?? [] as $_font){
+				$wpff = $this->get_val($_font, 'font-family');
+				$wpfs = $this->get_val($_font, 'font-style');
+				$wpfw = $this->get_val($_font, 'font-weight');
+				if(empty($wpff)) continue;
+				if(empty($wpfs)) continue;
+				if(empty($wpfw)) continue;
+				if(!isset($wp_font_list[$wpff])) $wp_font_list[$wpff] = [];
+				if(!isset($wp_font_list[$wpff]['variants'])) $wp_font_list[$wpff]['variants'] = [];
+				if(strpos($wpfw, ' ') !== false){
+					$wpfw = explode(' ', $wpfw);
+					$wp_font_list[$wpff]['variants'][$wpfs] = [
+						'from'	=> $this->get_val($wpfw, 0),
+						'to'	=> $this->get_val($wpfw, 1)
+					];
+				}else{
+					$wp_font_list[$wpff]['variants'][$wpfs] = $wpfw;
+				}
+			}
+		}
+
+		if(!empty($wp_font_list)){
+			foreach($SR_GLOBALS['fonts']['queue'] as $f_n => $f_s){		
+				if(empty($f_n)) continue;
+				if(isset($f_s['url']) && !empty($f_s['url'])) continue; //ignore custom
+				if(!isset($wp_font_list[$f_n])) continue;
+				$_variants	= $this->get_val($f_s, 'variants', ['normal' => [], 'italic' => []]);
+				foreach($_variants ?? [] as $f_w => $f_v){
+					$from	= (isset($wp_font_list[$f_n]['variants'][$f_w]) && is_array($wp_font_list[$f_n]['variants'][$f_w])) ? intval($wp_font_list[$f_n]['variants'][$f_w]['from']) : false;
+					$to		= (isset($wp_font_list[$f_n]['variants'][$f_w]) && is_array($wp_font_list[$f_n]['variants'][$f_w])) ? intval($wp_font_list[$f_n]['variants'][$f_w]['to']) : false;
+					$exact	= (isset($wp_font_list[$f_n]['variants'][$f_w]) && !is_array($wp_font_list[$f_n]['variants'][$f_w])) ? intval($wp_font_list[$f_n]['variants'][$f_w]) : false;
+
+					foreach($f_v ?? [] as $f_v_id => $f_v_check){
+						if($exact !== false){
+							if(intval($f_v_check) === $exact) unset($SR_GLOBALS['fonts']['queue'][$f_n]['variants'][$f_w][$f_v_id]);
+						}else{
+							if(intval($f_v_check) >= $from && intval($f_v_check) <= $to) unset($SR_GLOBALS['fonts']['queue'][$f_n]['variants'][$f_w][$f_v_id]);
+						}
+					}
+				}
+
+				if(
+					(!isset($SR_GLOBALS['fonts']['queue'][$f_n]['variants']['normal']) || empty($SR_GLOBALS['fonts']['queue'][$f_n]['variants']['normal'])) && 
+					(!isset($SR_GLOBALS['fonts']['queue'][$f_n]['variants']['italic']) || empty($SR_GLOBALS['fonts']['queue'][$f_n]['variants']['italic']))
+				){
+					unset($SR_GLOBALS['fonts']['queue'][$f_n]);
+				}
+			}
+		}
 	}
 
 	/**
@@ -1998,6 +2068,13 @@ rs-module .material-icons {
 	}
 
 	/**
+	 * checks if any shortcode format is present in given string
+	 */
+	public function has_any_shortcode($text){
+		return (preg_match('/\[.*?\]/', $text)) ? true : false;
+	}
+
+	/**
 	 * open and checks a zip file for filetypes
 	 **/
 	public function check_bad_files($zip_file, $extensions_allowed = false){
@@ -2204,6 +2281,25 @@ rs-module .material-icons {
 
 	
 	/**
+	 * checks if slide amount of v6 and v7 is the same, if not returns false
+	 */
+	public function check_if_migration_done($sid){
+		global $wpdb;
+		
+		$v6s	= $wpdb->get_results($wpdb->prepare("SELECT COUNT(slider_id) AS slides FROM " . $wpdb->prefix . RevSliderFront::TABLE_SLIDES . " WHERE slider_id = %d", array($sid)), ARRAY_A);
+		$v6ss	= $wpdb->get_results($wpdb->prepare("SELECT COUNT(slider_id) AS slides FROM " . $wpdb->prefix . RevSliderFront::TABLE_STATIC_SLIDES . " WHERE slider_id = %d", array($sid)), ARRAY_A);
+		$v7s	= $wpdb->get_results($wpdb->prepare("SELECT COUNT(slider_id) AS slides FROM " . $wpdb->prefix . RevSliderFront::TABLE_SLIDES . "7 WHERE slider_id = %d", array($sid)), ARRAY_A);
+		$v6st	= 0;
+		if(!empty($v6s) && !empty($v6ss)){
+			foreach(array_merge($v6s, $v6ss) as $item){
+				$v6st += $item['slides'];
+			}
+		}
+
+		return (intval($this->get_val($v7s, [0, 'slides'])) !== $v6st) ? false : true;
+	}
+	
+	/**
 	 * get a map of slide ids for v7 slides
 	 * we need this in the process to migrate v7 slides
 	 * as we merge normal and static slides here
@@ -2248,6 +2344,26 @@ rs-module .material-icons {
 				if($t !== $_type) continue;
 				if(isset($v[$v6_slide_id])) return $v[$v6_slide_id];
 			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * retrieves the v6 slide id by a v7 slide id from the slide map
+	 **/
+	public function get_v6_slide_by_v7_id($v7_slide_id){
+		$slide_map 	= get_option('sliderrevolution-v7-slide-map', array());
+		if(empty($slide_map)) return false;
+
+		foreach($slide_map as $module => $slides){
+			$_slides = $this->get_val($slides, 'n', []);
+			if(empty($_slides)) continue;
+			if(!in_array($v7_slide_id, $_slides)) continue;
+			foreach($_slides as $v6 => $v7){
+				if($v7 == $v7_slide_id) return $v6;
+			}
+			return false;
 		}
 
 		return false;

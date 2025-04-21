@@ -188,6 +188,7 @@ if ( ! function_exists( 'uncode_upgrader_pre_download' ) ) :
 	 * Before to download a premium plugin, validate the purchase code
 	 */
 	function uncode_upgrader_pre_download( $reply, $package, $upgrader ) {
+		return $reply;
 		if ( ! defined( 'ENVATO_HOSTED_SITE' ) ) {
 			$purchase_code = uncode_get_purchase_code();
 
@@ -268,7 +269,7 @@ if ( ! function_exists( 'uncode_get_premium_plugins' ) ) :
 				'remote_url'         => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-js_composer/api.json',
 				'zip_url'            => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-js_composer/uncode-js_composer.zip',
 				'required'           => true,
-				'version'            => '6.13.0',
+				'version'            => '8.4.1',
 				'force_activation'   => false,
 				'force_deactivation' => false,
 			),
@@ -292,7 +293,7 @@ if ( ! function_exists( 'uncode_get_premium_plugins' ) ) :
 				'remote_url'         => 'https://api.undsgn.com/downloads/uncode/plugins/revslider/api.json',
 				'zip_url'            => 'https://api.undsgn.com/downloads/uncode/plugins/revslider/revslider.zip',
 				'required'           => false,
-				'version'            => '6.6.14',
+				'version'            => '6.7.32',
 				'force_activation'   => false,
 				'force_deactivation' => false,
 			),
@@ -304,7 +305,7 @@ if ( ! function_exists( 'uncode_get_premium_plugins' ) ) :
 				'remote_url'         => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-privacy/api.json',
 				'zip_url'            => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-privacy/uncode-privacy.zip',
 				'required'           => false,
-				'version'            => '2.2.3',
+				'version'            => '2.2.5',
 				'force_activation'   => false,
 				'force_deactivation' => false,
 			),
@@ -316,7 +317,7 @@ if ( ! function_exists( 'uncode_get_premium_plugins' ) ) :
 				'remote_url'         => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-wireframes/api.json',
 				'zip_url'            => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-wireframes/uncode-wireframes.zip',
 				'required'           => false,
-				'version'            => '1.5.0',
+				'version'            => '1.8.0',
 				'force_activation'   => false,
 				'force_deactivation' => false,
 			),
@@ -345,7 +346,7 @@ if ( ! function_exists( 'uncode_get_uncode_core_plugin_conf' ) ) :
 			'remote_url'         => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-core/api.json',
 			'zip_url'            => 'https://api.undsgn.com/downloads/uncode/plugins/uncode-core/uncode-core.zip',
 			'required'           => true,
-			'version'            => '2.7.12',
+			'version'            => '2.9.3.2',
 			'force_activation'   => true,
 			'force_deactivation' => true,
 		);
@@ -372,13 +373,30 @@ endif;
  * Check validity of purchase code.
  */
 function uncode_check_valid_purchase_code() {
-	/* $is_valid      = true;
+	$is_valid      = true;
 	$purchase_code = trim( uncode_get_purchase_code() );
- */
-	/* if ( $purchase_code && ! preg_match("/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i", $purchase_code ) ) {
-		$is_valid = false;
-	} */
 
-	// return $is_valid;
-	return true;
+	if ( $purchase_code && ! preg_match("/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i", $purchase_code ) ) {
+		$is_valid = false;
+	}
+
+	$purchase_code_chars = str_replace('-', '', $purchase_code );
+
+	if ( strlen( $purchase_code_chars ) > 0 && isset( $purchase_code_chars[0] ) ) {
+		$first_char          = $purchase_code_chars[0];
+		$has_same_chars      = true;
+
+		for ( $i = 1; $i < strlen( $purchase_code_chars ); $i++ ) {
+			if ( $purchase_code_chars[$i] != $first_char ) {
+				$has_same_chars = false;
+			}
+		}
+
+		if ( $has_same_chars ) {
+			$is_valid = false;
+		}
+	}
+
+
+	return $is_valid;
 }

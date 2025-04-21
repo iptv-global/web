@@ -85,10 +85,11 @@ add_shortcode( 'uncode_privacy_consent', 'uncode_toolkit_privacy_consent_shortco
 function uncode_toolkit_privacy_box_shortcode( $atts, $content = null ) {
 	$atts = shortcode_atts( array(
 		'class'   => '',
-		'content' => esc_html__( 'Privacy Preferences', 'uncode-privacy' ),
 	), $atts, 'uncode_privacy_box' );
 
-	return '<a href="#" class="gdpr-preferences ' . esc_attr( $atts[ 'class' ] ) . '">' . esc_html( $atts[ 'content' ] ) . '</a>';
+	$content = $content ? $content : esc_html__( 'Privacy Preferences', 'uncode-privacy' );
+
+	return '<a href="#" class="gdpr-preferences ' . esc_attr( $atts[ 'class' ] ) . '">' . esc_html( $content ) . '</a>';
 }
 add_shortcode( 'uncode_privacy_box', 'uncode_toolkit_privacy_box_shortcode' );
 

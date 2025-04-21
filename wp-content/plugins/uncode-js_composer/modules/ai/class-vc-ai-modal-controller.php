@@ -1,4 +1,10 @@
 <?php
+/**
+ * AI modal controller.
+ *
+ * @since 7.2
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -12,10 +18,31 @@ class Vc_Ai_Modal_Controller {
 	/**
 	 * Credits limit per a site.
 	 * we use it value only if we do not have response value.
+	 *
 	 * @since 7.2
 	 * @var int
 	 */
 	public $credits_limit;
+
+	/**
+	 * Ai element type.
+	 *
+	 * @var string
+	 */
+	public $ai_element_type;
+
+	/**
+	 * Set AI element type.
+	 *
+	 * @since 8.3
+	 * @param string $ai_element_type
+	 * @return Vc_Ai_Modal_Controller
+	 */
+	public function set_ai_element_type( $ai_element_type ) {
+		$this->ai_element_type = $ai_element_type;
+
+		return $this;
+	}
 
 	/**
 	 * Get AI modal data.
@@ -25,6 +52,7 @@ class Vc_Ai_Modal_Controller {
 	 * @return array
 	 */
 	public function get_modal_data( $modal_param ) {
+		$this->set_ai_element_type( $modal_param['ai_element_type'] );
 		$response['type'] = 'promo';
 		if ( ! vc_license()->isActivated() ) {
 			$response['content'] =
@@ -205,7 +233,7 @@ class Vc_Ai_Modal_Controller {
 
 		if ( strpos( $message, 'license has expired' ) !== false ) {
 			$response = 'license_not_valid';
-			// user disabled it on a support portal, but still has in options
+			// user disabled it on a support portal, but still has in options.
 		} elseif ( strpos( $message, 'WPBakery Page Builder license not activated' ) !== false ) {
 			$response = 'license_not_valid';
 		} elseif ( strpos( $message, 'reached your monthly limit' ) !== false ) {
@@ -266,9 +294,9 @@ class Vc_Ai_Modal_Controller {
 		$type_dependency = [
 			'textarea_html' => 'editors/popups/ai/generate-text.php',
 			'textarea' => 'editors/popups/ai/generate-text.php',
-			'textarea_raw_html' => [
-				'default' => 'editors/popups/ai/generate-text.php',
-				'textarea_raw_html_javascript_code' => 'editors/popups/ai/generate-code.php',
+			'textarea_ace' => [
+				'textarea_ace_raw_html' => 'editors/popups/ai/generate-text.php',
+				'textarea_ace_javascript_code' => 'editors/popups/ai/generate-code.php',
 			],
 			'textfield' => 'editors/popups/ai/generate-text.php',
 			'custom_css' => 'editors/popups/ai/generate-code.php',
@@ -294,7 +322,7 @@ class Vc_Ai_Modal_Controller {
 
 		if ( ! empty( $template_list[ $ai_element_type ][ $ai_element_id ] ) ) {
 			$template_path = $template_list[ $ai_element_type ][ $ai_element_id ];
-		} else if ( ! empty( $template_list[ $ai_element_type ]['default'] ) ) {
+		} elseif ( ! empty( $template_list[ $ai_element_type ]['default'] ) ) {
 			$template_path = $template_list[ $ai_element_type ]['default'];
 		} else {
 			$template_path = '';
@@ -310,74 +338,78 @@ class Vc_Ai_Modal_Controller {
 	 * @return array
 	 */
 	public function get_ton_of_voice_list() {
-		$list = apply_filters( 'wpb_ai_tone_of_voice_list', [
-			'approachable' => esc_html__( 'Approachable', 'js_composer' ),
-			'excited' => esc_html__( 'Excited', 'js_composer' ),
-			'playful' => esc_html__( 'Playful', 'js_composer' ),
-			'assertive' => esc_html__( 'Assertive', 'js_composer' ),
-			'formal' => esc_html__( 'Formal', 'js_composer' ),
-			'poetic' => esc_html__( 'Poetic', 'js_composer' ),
-			'bold' => esc_html__( 'Bold', 'js_composer' ),
-			'friendly' => esc_html__( 'Friendly', 'js_composer' ),
-			'positive' => esc_html__( 'Positive', 'js_composer' ),
-			'candid' => esc_html__( 'Candid', 'js_composer' ),
-			'funny' => esc_html__( 'Funny', 'js_composer' ),
-			'powerful' => esc_html__( 'Powerful', 'js_composer' ),
-			'caring' => esc_html__( 'Caring', 'js_composer' ),
-			'gentle' => esc_html__( 'Gentle', 'js_composer' ),
-			'professional' => esc_html__( 'Professional', 'js_composer' ),
-			'casual' => esc_html__( 'Casual', 'js_composer' ),
-			'helpful' => esc_html__( 'Helpful', 'js_composer' ),
-			'quirky' => esc_html__( 'Quirky', 'js_composer' ),
-			'cheerful' => esc_html__( 'Cheerful', 'js_composer' ),
-			'hopeful' => esc_html__( 'Hopeful', 'js_composer' ),
-			'reassuring' => esc_html__( 'Reassuring', 'js_composer' ),
-			'clear' => esc_html__( 'Clear', 'js_composer' ),
-			'humorous' => esc_html__( 'Humorous', 'js_composer' ),
-			'reflective' => esc_html__( 'Reflective', 'js_composer' ),
-			'commanding' => esc_html__( 'Commanding', 'js_composer' ),
-			'informal' => esc_html__( 'Informal', 'js_composer' ),
-			'respectful' => esc_html__( 'Respectful', 'js_composer' ),
-			'comprehensive' => esc_html__( 'Comprehensive', 'js_composer' ),
-			'informative' => esc_html__( 'Informative', 'js_composer' ),
-			'romantic' => esc_html__( 'Romantic', 'js_composer' ),
-			'confident' => esc_html__( 'Confident', 'js_composer' ),
-			'inspirational' => esc_html__( 'Inspirational', 'js_composer' ),
-			'sarcastic' => esc_html__( 'Sarcastic', 'js_composer' ),
-			'conversational' => esc_html__( 'Conversational', 'js_composer' ),
-			'inspiring' => esc_html__( 'Inspiring', 'js_composer' ),
-			'scientific' => esc_html__( 'Scientific', 'js_composer' ),
-			'curious' => esc_html__( 'Curious', 'js_composer' ),
-			'lively' => esc_html__( 'Lively', 'js_composer' ),
-			'serious' => esc_html__( 'Serious', 'js_composer' ),
-			'detailed' => esc_html__( 'Detailed', 'js_composer' ),
-			'melancholic' => esc_html__( 'Melancholic', 'js_composer' ),
-			'technical' => esc_html__( 'Technical', 'js_composer' ),
-			'educational' => esc_html__( 'Educational', 'js_composer' ),
-			'motivational' => esc_html__( 'Motivational', 'js_composer' ),
-			'thought-provoking' => esc_html__( 'Thought-provoking', 'js_composer' ),
-			'eloquent' => esc_html__( 'Eloquent', 'js_composer' ),
-			'negative' => esc_html__( 'Negative', 'js_composer' ),
-			'thoughtful' => esc_html__( 'Thoughtful', 'js_composer' ),
-			'emotional' => esc_html__( 'Emotional', 'js_composer' ),
-			'neutral' => esc_html__( 'Neutral', 'js_composer' ),
-			'uplifting' => esc_html__( 'Uplifting', 'js_composer' ),
-			'empathetic' => esc_html__( 'Empathetic', 'js_composer' ),
-			'nostalgic' => esc_html__( 'Nostalgic', 'js_composer' ),
-			'urgent' => esc_html__( 'Urgent', 'js_composer' ),
-			'empowering' => esc_html__( 'Empowering', 'js_composer' ),
-			'offbeat' => esc_html__( 'Offbeat', 'js_composer' ),
-			'vibrant' => esc_html__( 'Vibrant', 'js_composer' ),
-			'encouraging' => esc_html__( 'Encouraging', 'js_composer' ),
-			'passionate' => esc_html__( 'Passionate', 'js_composer' ),
-			'visionary' => esc_html__( 'Visionary', 'js_composer' ),
-			'engaging' => esc_html__( 'Engaging', 'js_composer' ),
-			'personal' => esc_html__( 'Personal', 'js_composer' ),
-			'witty' => esc_html__( 'Witty', 'js_composer' ),
-			'enthusiastic' => esc_html__( 'Enthusiastic', 'js_composer' ),
-			'persuasive' => esc_html__( 'Persuasive', 'js_composer' ),
-			'zealous' => esc_html__( 'Zealous', 'js_composer' ),
-		]);
+		$list = apply_filters(
+			'wpb_ai_tone_of_voice_list',
+			[
+				'approachable' => esc_html__( 'Approachable', 'js_composer' ),
+				'excited' => esc_html__( 'Excited', 'js_composer' ),
+				'playful' => esc_html__( 'Playful', 'js_composer' ),
+				'assertive' => esc_html__( 'Assertive', 'js_composer' ),
+				'formal' => esc_html__( 'Formal', 'js_composer' ),
+				'poetic' => esc_html__( 'Poetic', 'js_composer' ),
+				'bold' => esc_html__( 'Bold', 'js_composer' ),
+				'friendly' => esc_html__( 'Friendly', 'js_composer' ),
+				'positive' => esc_html__( 'Positive', 'js_composer' ),
+				'candid' => esc_html__( 'Candid', 'js_composer' ),
+				'funny' => esc_html__( 'Funny', 'js_composer' ),
+				'powerful' => esc_html__( 'Powerful', 'js_composer' ),
+				'caring' => esc_html__( 'Caring', 'js_composer' ),
+				'gentle' => esc_html__( 'Gentle', 'js_composer' ),
+				'professional' => esc_html__( 'Professional', 'js_composer' ),
+				'casual' => esc_html__( 'Casual', 'js_composer' ),
+				'helpful' => esc_html__( 'Helpful', 'js_composer' ),
+				'quirky' => esc_html__( 'Quirky', 'js_composer' ),
+				'cheerful' => esc_html__( 'Cheerful', 'js_composer' ),
+				'hopeful' => esc_html__( 'Hopeful', 'js_composer' ),
+				'reassuring' => esc_html__( 'Reassuring', 'js_composer' ),
+				'clear' => esc_html__( 'Clear', 'js_composer' ),
+				'humorous' => esc_html__( 'Humorous', 'js_composer' ),
+				'reflective' => esc_html__( 'Reflective', 'js_composer' ),
+				'commanding' => esc_html__( 'Commanding', 'js_composer' ),
+				'informal' => esc_html__( 'Informal', 'js_composer' ),
+				'respectful' => esc_html__( 'Respectful', 'js_composer' ),
+				'comprehensive' => esc_html__( 'Comprehensive', 'js_composer' ),
+				'informative' => esc_html__( 'Informative', 'js_composer' ),
+				'romantic' => esc_html__( 'Romantic', 'js_composer' ),
+				'confident' => esc_html__( 'Confident', 'js_composer' ),
+				'inspirational' => esc_html__( 'Inspirational', 'js_composer' ),
+				'sarcastic' => esc_html__( 'Sarcastic', 'js_composer' ),
+				'conversational' => esc_html__( 'Conversational', 'js_composer' ),
+				'inspiring' => esc_html__( 'Inspiring', 'js_composer' ),
+				'scientific' => esc_html__( 'Scientific', 'js_composer' ),
+				'curious' => esc_html__( 'Curious', 'js_composer' ),
+				'lively' => esc_html__( 'Lively', 'js_composer' ),
+				'serious' => esc_html__( 'Serious', 'js_composer' ),
+				'detailed' => esc_html__( 'Detailed', 'js_composer' ),
+				'melancholic' => esc_html__( 'Melancholic', 'js_composer' ),
+				'technical' => esc_html__( 'Technical', 'js_composer' ),
+				'educational' => esc_html__( 'Educational', 'js_composer' ),
+				'motivational' => esc_html__( 'Motivational', 'js_composer' ),
+				'thought-provoking' => esc_html__( 'Thought-provoking', 'js_composer' ),
+				'eloquent' => esc_html__( 'Eloquent', 'js_composer' ),
+				'negative' => esc_html__( 'Negative', 'js_composer' ),
+				'thoughtful' => esc_html__( 'Thoughtful', 'js_composer' ),
+				'emotional' => esc_html__( 'Emotional', 'js_composer' ),
+				'neutral' => esc_html__( 'Neutral', 'js_composer' ),
+				'uplifting' => esc_html__( 'Uplifting', 'js_composer' ),
+				'empathetic' => esc_html__( 'Empathetic', 'js_composer' ),
+				'nostalgic' => esc_html__( 'Nostalgic', 'js_composer' ),
+				'urgent' => esc_html__( 'Urgent', 'js_composer' ),
+				'empowering' => esc_html__( 'Empowering', 'js_composer' ),
+				'offbeat' => esc_html__( 'Offbeat', 'js_composer' ),
+				'vibrant' => esc_html__( 'Vibrant', 'js_composer' ),
+				'encouraging' => esc_html__( 'Encouraging', 'js_composer' ),
+				'passionate' => esc_html__( 'Passionate', 'js_composer' ),
+				'visionary' => esc_html__( 'Visionary', 'js_composer' ),
+				'engaging' => esc_html__( 'Engaging', 'js_composer' ),
+				'personal' => esc_html__( 'Personal', 'js_composer' ),
+				'witty' => esc_html__( 'Witty', 'js_composer' ),
+				'enthusiastic' => esc_html__( 'Enthusiastic', 'js_composer' ),
+				'persuasive' => esc_html__( 'Persuasive', 'js_composer' ),
+				'zealous' => esc_html__( 'Zealous', 'js_composer' ),
+			],
+			$this->ai_element_type
+		);
 
 		$list = is_array( $list ) ? $list : [];
 		asort( $list );
@@ -393,34 +425,45 @@ class Vc_Ai_Modal_Controller {
 	 * @return array
 	 */
 	public function get_number_of_symbols_list( $ai_element_type ) {
-		$list = apply_filters( 'wpb_ai_number_of_symbols_list', [
-			'textarea_html' => [
-				'[10,15]' => 'Title (up to 15 words)',
-				'[15,25]' => 'Short description (up to 25 words)',
-				'[20,50]' => 'Description (up to 50 words)',
-				'[200,300]' => 'Long description (up to 300 words)',
-				'[400,600]' => 'Short article (up to 600 words)',
-				'[800,1200]' => 'Long article (800 - 1200 words)',
+		$list = apply_filters(
+			'wpb_ai_number_of_symbols_list',
+			[
+				'textarea_html' => [
+					'[10,15]' => 'Title (up to 15 words)',
+					'[15,25]' => 'Short description (up to 25 words)',
+					'[20,50]' => 'Description (up to 50 words)',
+					'[200,300]' => 'Long description (up to 300 words)',
+					'[400,600]' => 'Short article (up to 600 words)',
+					'[800,1200]' => 'Long article (800 - 1200 words)',
+				],
+				'textarea_raw_html' => [
+					'[10,15]' => 'Title (up to 15 words)',
+					'[15,25]' => 'Short description (up to 25 words)',
+					'[20,50]' => 'Description (up to 50 words)',
+					'[200,300]' => 'Long description (up to 300 words)',
+					'[400,600]' => 'Short article (up to 600 words)',
+					'[800,1200]' => 'Long article (800 - 1200 words)',
+				],
+				'textarea_ace' => [
+					'[10,15]' => 'Title (up to 15 words)',
+					'[15,25]' => 'Short description (up to 25 words)',
+					'[20,50]' => 'Description (up to 50 words)',
+					'[200,300]' => 'Long description (up to 300 words)',
+					'[400,600]' => 'Short article (up to 600 words)',
+					'[800,1200]' => 'Long article (800 - 1200 words)',
+				],
+				'textarea' => [
+					'[10,15]' => 'Title (up to 15 words)',
+					'[15,25]' => 'Short description (up to 25 words)',
+					'[20,50]' => 'Description (up to 50 words)',
+					'[200,300]' => 'Long description (up to 300 words)',
+				],
+				'textfield' => [
+					'[10,15]' => 'Title (up to 15 words)',
+				],
 			],
-			'textarea_raw_html' => [
-				'[10,15]' => 'Title (up to 15 words)',
-				'[15,25]' => 'Short description (up to 25 words)',
-				'[20,50]' => 'Description (up to 50 words)',
-				'[200,300]' => 'Long description (up to 300 words)',
-				'[400,600]' => 'Short article (up to 600 words)',
-				'[800,1200]' => 'Long article (800 - 1200 words)',
-			],
-			'textarea' => [
-				'[10,15]' => 'Title (up to 15 words)',
-				'[15,25]' => 'Short description (up to 25 words)',
-				'[20,50]' => 'Description (up to 50 words)',
-				'[200,300]' => 'Long description (up to 300 words)',
-			],
-			'textfield' => [
-				'[10,15]' => 'Title (up to 15 words)',
-				'[15,25]' => 'Short description (up to 25 words)',
-			],
-		]);
+			$this->ai_element_type
+		);
 
 		if (
 			! is_array( $list ) ||
@@ -430,7 +473,7 @@ class Vc_Ai_Modal_Controller {
 			$list = [];
 		}
 
-		return  $list[ $ai_element_type ];
+		return $list[ $ai_element_type ];
 	}
 
 	/**
@@ -440,11 +483,15 @@ class Vc_Ai_Modal_Controller {
 	 * @return array
 	 */
 	public function get_content_generate_variant() {
-		$content = apply_filters( 'wpb_ai_content_type_list', [
-			'new_content' => esc_html__( 'New content', 'js_composer' ),
-			'improve_existing' => esc_html__( 'Improve existing', 'js_composer' ),
-			'translate' => esc_html__( 'Translate', 'js_composer' ),
-		]);
+		$content = apply_filters(
+			'wpb_ai_content_type_list',
+			[
+				'new_content' => esc_html__( 'New content', 'js_composer' ),
+				'improve_existing' => esc_html__( 'Improve existing', 'js_composer' ),
+				'translate' => esc_html__( 'Translate', 'js_composer' ),
+			],
+			$this->ai_element_type
+		);
 
 		return is_array( $content ) ? $content : [];
 	}
@@ -456,24 +503,27 @@ class Vc_Ai_Modal_Controller {
 	 * @return array
 	 */
 	public function get_content_type_form_fields_optionality() {
-		$optionality = apply_filters( 'wpb_ai_form_fields_optionality_content_type', [
-			'new_content' => [
-				'contentType',
-				'prompt',
-				'toneOfVoice',
-				'length',
-				'keyWords',
-			],
-			'improve_existing' => [
-				'contentType',
-				'toneOfVoice',
-				'keyWords',
-			],
-			'translate' => [
-				'contentType',
-				'language',
-			],
-		]);
+		$optionality = apply_filters(
+			'wpb_ai_form_fields_optionality_content_type',
+			[
+				'new_content' => [
+					'contentType',
+					'prompt',
+					'toneOfVoice',
+					'length',
+					'keyWords',
+				],
+				'improve_existing' => [
+					'contentType',
+					'toneOfVoice',
+					'keyWords',
+				],
+				'translate' => [
+					'contentType',
+					'language',
+				],
+			]
+		);
 
 		return is_array( $optionality ) ? $optionality : [];
 	}

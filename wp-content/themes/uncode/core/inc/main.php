@@ -517,6 +517,12 @@ function uncode_equeue() {
 		'uncode_smooth_scroll_safe'  => apply_filters( 'uncode_smooth_scroll_safe', ot_get_option( '_uncode_smooth_scroll_safe' ) === 'on' ),
 		'uncode_lb_add_galleries'    => apply_filters( 'uncode_lb_add_galleries', ', .gallery' ),
 		'uncode_lb_add_items' 	     => apply_filters( 'uncode_lb_add_items', ', .gallery .gallery-item a' ),
+		'uncode_prev_label'          => apply_filters( 'uncode_prev_label', esc_html__( 'Previous', 'uncode' ) ),
+		'uncode_next_label' 	     => apply_filters( 'uncode_next_label', esc_html__( 'Next', 'uncode' ) ),
+		'uncode_slide_label' 	     => apply_filters( 'uncode_slide_label', esc_html__( 'Slide', 'uncode' ) ),
+		'uncode_share_label' 	     => apply_filters( 'uncode_share_label', esc_html__( 'Share on %', 'uncode' ) ),
+		'uncode_has_ligatures' 	     => apply_filters( 'uncode_has_ligatures', false ),
+		'uncode_is_accessible'		 => uncode_is_accessible(),
 	);
 
 	/** JS */
@@ -541,8 +547,6 @@ function uncode_equeue() {
 	}
 
 	wp_enqueue_script('uncode-init', get_template_directory_uri() . '/library/js/init' . $suffix . '.js', array() , $resources_version, false);
-
-	wp_localize_script( 'uncode-init', 'SiteParameters', $site_parameters );
 
 	if ( $native_media_player === true && function_exists( 'uncode_deregister_script' ) ) {
 		uncode_deregister_script('mediaelement');
@@ -656,7 +660,6 @@ function uncode_equeue() {
 			} else {
 				$output_width = $main_width[0];
 				$output_unit = '%';
-				$output_css .= "\n@media (min-width: 960px) { .limit-width { max-width: " . $main_width[0] . "%; " . $main_align_css . "}}";
 			}
 		} else {
 			if (strpos($main_width, 'px') !== false) {
@@ -668,8 +671,11 @@ function uncode_equeue() {
 			}
 		}
 
+		$site_parameters['uncode_limit_width'] = $output_width . $output_unit;
 		$output_css .= "\n@media (min-width: 960px) { .limit-width { max-width: " . $output_width . $output_unit . "; " . $main_align_css . "}}";
 	}
+
+	wp_localize_script( 'uncode-init', 'SiteParameters', $site_parameters );
 
 	$body_border = ot_get_option('_uncode_body_border');
 	$body_border = ($body_border !== '' && $body_border !== 0) ? $body_border : 0;
@@ -819,7 +825,7 @@ function uncode_body_classes($classes){
 	$boxed = ot_get_option('_uncode_boxed');
 	$main_align = ot_get_option('_uncode_main_align');
 
-	if ($menutype === '') {
+	if (!$menutype) {
 		$menutype = 'hmenu-right';
 	}
 	if (strpos($menutype, 'vmenu') !== false) {
@@ -1223,6 +1229,10 @@ function uncode_body_classes($classes){
 		if ( $blur_menu !== '' ) {
 			$classes[] = 'blur-menu-' . $blur_menu;
 		}
+	}
+
+	if ( uncode_is_accessible() ) {
+		$classes[] = 'uncode-accessible';
 	}
 
 	return $classes;

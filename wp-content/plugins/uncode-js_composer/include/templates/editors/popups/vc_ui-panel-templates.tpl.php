@@ -1,4 +1,10 @@
 <?php
+/**
+ * Templates panel template.
+ *
+ * @var Vc_Templates_Panel_Editor $box
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -12,22 +18,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 		$categories = $box->getAllCategoriesNames( $categories_data );
 		?>
 		<?php
-		vc_include_template( 'editors/popups/vc_ui-header.tpl.php', array(
+		vc_include_template( 'editors/popups/vc_ui-header.tpl.php', [
 			// BEGIN UNCODE EDIT
 			'title' => apply_filters( 'uncode_templates_window_title', esc_html__( 'Templates', 'js_composer' ) ),
 			// END UNCODE EDIT
-			'controls' => array(
+			'controls' => [
 				'minimize',
 				'close',
-			),
+			],
 			'header_css_class' => 'vc_ui-template-panel-header-container',
-			'content_template' => 'editors/partials/vc_ui-templates-tabs.tpl.php',
+			'header_tabs_template' => 'editors/partials/vc_ui-templates-tabs.tpl.php',
 			'search_template' => 'editors/partials/templates_search.tpl.php',
-			'template_variables' => array(
+			'header_tabs_template_variables' => [
 				'categories_data' => $categories_data,
 				'categories' => $categories,
-			),
-		) );
+			],
+			'box' => $box,
+		] );
 		?>
 		<!-- param window footer-->
 		<div class="vc_ui-panel-content-container">
@@ -35,6 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				data-vc-ui-element="panel-content">
 				<div class="vc_panel-tabs">
 					<?php
+					echo '<div class="vc-panel-no-templates-message">' . esc_html__( 'No templates found', 'js_composer' ) . '</div>';
 					/**
 					 * Preparing tabs content
 					 */
@@ -42,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php
 					$first = true;
 					foreach ( $categories_data as $key => $category ) :
-						echo '<div class="vc_edit-form-tab vc_row vc_ui-flex-row' . ( $first ? ' vc_active' : '' ) . '"' . ' data-vc-ui-element="panel-edit-element-tab"' . ' data-tab="' . esc_attr( $category['category'] ) . '">';
+						echo '<div class="vc_edit-form-tab vc_row vc_ui-flex-row' . ( $first ? ' vc_active' : '' ) . '" data-vc-ui-element="panel-edit-element-tab" data-tab="' . esc_attr( $category['category'] ) . '">';
 						// BEGIN UNCODE EDIT
 						do_action( 'uncode_wireframes_before_templates_list', $category );
 						// END UNCODE EDIT

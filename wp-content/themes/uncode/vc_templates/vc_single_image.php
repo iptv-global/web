@@ -1,6 +1,6 @@
 <?php
 
-$title = $media = $col_width = $mobile_width = $medium_width = $media_width_use_pixel = $media_width_percent = $media_width_pixel = $media_ratio = $media_lightbox = $media_poster = $media_link = $advanced = $media_items = $media_text = $media_style = $media_back_color = $media_overlay_color = $media_overlay_coloration = $media_overlay_color_blend = $media_overlay_opacity = $media_text_visible = $media_text_anim = $media_text_anim_type = $media_overlay_visible = $media_overlay_anim = $media_image_coloration = $media_image_color_anim = $media_image_anim = $media_image_magnetic = $media_h_align = $media_v_position = $media_reduced = $media_h_position = $media_padding = $media_text_reduced = $media_title_custom = $media_caption_custom = $media_title_transform = $media_title_dimension = $media_title_family = $media_title_weight = $media_title_height = $media_title_space = $media_subtitle_custom = $media_icon = $media_elements_click = $lbox_skin = $lbox_transparency = $lbox_dir = $lbox_title = $lbox_caption = $lbox_social = $lbox_deep = $lbox_deep_id = $lbox_no_tmb = $lbox_no_arrows = $lbox_gallery_arrows = $lbox_gallery_arrows_bg = $lbox_zoom_origin = $lbox_connected = $lbox_actual_size = $lbox_full = $lbox_download = $lbox_counter = $lbox_transition = $link = $alignment = $el_id = $el_class = $css_animation = $animation_delay = $animation_speed = $skew = $rotating = $shape = $radius = $caption = $custom_title_semantic = $custom_title_size = $custom_title_height = $custom_title_space = $custom_title_font = $custom_title_weight = $custom_title_transform = $custom_title_italic = $border = $shadow = $shadow_weight = $shadow_darker = $output = $single_width = $single_height = $single_fixed = $style_preset = $css = $div_data = $lightbox_classes = $dummy_oembed = $carousel_textual = $media_code = $text_lead = $dynamic = $dynamic_source = $custom_cursor = $advanced_videos = $play_hover = $play_pause = $mobile_videos = $lb_video_advanced = $lb_autoplay = $lb_muted = $heading_custom_size = '';
+$title = $media = $col_width = $mobile_width = $medium_width = $media_width_use_pixel = $media_width_percent = $media_width_pixel = $media_ratio = $media_lightbox = $media_poster = $media_link = $advanced = $media_items = $media_text = $media_style = $media_back_color = $media_overlay_color = $media_overlay_coloration = $media_overlay_color_blend = $media_overlay_opacity = $media_text_visible = $media_text_anim = $media_text_anim_type = $media_overlay_visible = $media_overlay_anim = $media_image_coloration = $media_image_color_anim = $media_image_anim = $media_image_magnetic = $media_h_align = $media_v_position = $media_image_scroll = $media_image_scroll_val = $media_reduced = $media_h_position = $media_padding = $media_text_reduced = $media_title_custom = $media_caption_custom = $media_title_transform = $media_title_dimension = $media_title_family = $media_title_weight = $media_title_height = $media_title_space = $media_subtitle_custom = $media_icon = $media_elements_click = $lbox_skin = $lbox_transparency = $lbox_dir = $lbox_title = $lbox_caption = $lbox_social = $lbox_deep = $lbox_deep_id = $lbox_no_tmb = $lbox_no_arrows = $lbox_gallery_arrows = $lbox_gallery_arrows_bg = $lbox_zoom_origin = $lbox_connected = $lbox_actual_size = $lbox_full = $lbox_download = $lbox_counter = $lbox_transition = $link = $alignment = $el_id = $el_class = $css_animation = $animation_delay = $animation_speed = $skew = $rotating = $shape = $radius = $caption = $border = $shadow = $shadow_weight = $shadow_darker = $output = $single_width = $single_height = $single_fixed = $style_preset = $css = $div_data = $lightbox_classes = $dummy_oembed = $carousel_textual = $media_code = $text_lead = $dynamic = $dynamic_source = $custom_cursor = $advanced_videos = $play_hover = $play_pause = $mobile_videos = $lb_video_advanced = $lb_autoplay = $lb_muted = $heading_custom_size = $media_image_scroll = $media_image_scroll_val = $animation_easing = $media_mask_direction = $bg_delay = $no_lazy = '';
 
 extract(shortcode_atts(array(
 	'uncode_shortcode_id' => '',
@@ -43,12 +43,19 @@ extract(shortcode_atts(array(
 	'media_image_magnetic' => '',
 	'media_h_align' => 'left',
 	'media_v_position' => '',
+	'media_image_scroll' => 'parallax',
+	'media_image_scroll_val' => 5,
 	'media_reduced' => '',
 	'media_h_position' => 'left',
+	'media_image_scroll' => 'parallax',
+	'media_image_scroll_val' => 5,
 	'media_padding' => '',
 	'media_text_reduced' => '',
 	'media_title_custom' => '',
 	'media_title_transform' => '',
+	'animation_easing' => '',
+	'media_mask_direction' => '',
+	'bg_delay' => '',
 	'media_title_dimension' => '',
 	'heading_custom_size' => '',
 	'media_title_family' => '',
@@ -121,7 +128,8 @@ extract(shortcode_atts(array(
 	'lb_muted' => '',
 	'desktop_visibility' => '',
 	'medium_visibility' => '',
-	'mobile_visibility' => '',	
+	'mobile_visibility' => '',
+	'no_lazy' => ''
 ) , $atts));
 
 if ( $el_id !== '' ) {
@@ -157,6 +165,11 @@ $stylesArray = array(
 
 global $lightbox_id, $previous_blend;
 
+$lazy = uncode_dynamic_srcset_lazy_loading_enabled();
+if ( $no_lazy === 'yes' && $lazy === true ) {
+	add_filter( 'uncode_dynamic_srcset_lazy_loading_enabled', '__return_false' );
+}
+
 if ($desktop_visibility === 'yes') {
 	$resp_classes[] = 'desktop-hidden';
 }
@@ -169,7 +182,7 @@ if ($mobile_visibility === 'yes') {
 
 $resp_classes[] = $this->getExtraClass($el_class);
 
-$el_class = esc_attr(trim(implode( ' ', $resp_classes ))); 
+$el_class = esc_attr(trim(implode( ' ', $resp_classes )));
 
 $media = apply_filters( 'wpml_object_id', intval( $media ), 'attachment', true );
 
@@ -389,6 +402,43 @@ if ($no_double_tap === 'yes') {
 	$block_classes[] = 'tmb-no-double-tap';
 }
 
+if ( $css_animation === 'mask' || ($advanced === 'yes' && $media_image_anim === 'scroll') ) {
+	$block_classes[] = 'tmb-mask';
+
+	if ( $css_animation === 'mask' ) {
+		$block_classes[] = 'tmb-mask-reveal';
+		if ($animation_delay !== '') {
+			$tmb_data['data-delay'] = $animation_delay;
+		}
+		if ($animation_speed !== '') {
+			$tmb_data['data-speed'] = $animation_speed;
+		}
+		if ($animation_easing !== '') {
+			$tmb_data['data-easing'] = $animation_easing;
+		}
+		if ($media_mask_direction !== '') {
+			$block_classes[] = 'tmb-mask-reveal-' . $media_mask_direction;
+		}
+		if ($bg_delay !== '') {
+			$tmb_data['data-bg-delay'] = $bg_delay;
+		}
+	}
+
+	if ($advanced === 'yes' && $media_image_anim === 'scroll') {
+		$block_classes[] = 'tmb-mask-scroll';
+		$block_classes[] = 'tmb-mask-scroll-' . esc_attr($media_image_scroll);
+		$tmb_data['data-scroll-val'] = intval( $media_image_scroll_val );
+	}
+
+	if ( $css_animation === 'mask' ) {
+		$hex_color = get_post_meta($media, '_uncode_hex_val', true);
+		if ( $hex_color ) {
+			$block_classes[] = 'tmb-has-hex';
+			$block_data['hex'] = $hex_color;
+		}
+	}
+}
+
 if ( $advanced === 'yes' && $media_meta_custom_typo === 'yes' ) {
 	if ( $media_meta_size !== '' ) {
 		$block_classes[] = 'tmb-meta-size-' . $media_meta_size;
@@ -455,7 +505,7 @@ if ($css_animation !== '' && uncode_animations_enabled()) {
 	if ( $css_animation === 'parallax' ) {
 		$css_class .= ' parallax-el';
 		$div_data .= uncode_get_parallax_div_data( $parallax_intensity, $parallax_centered, true );
-	} else {
+	} elseif ( $css_animation !== '' && $css_animation !== 'mask' ) {
 		$css_class .= ' animate_when_almost_visible ' . $css_animation;
 		if ($animation_delay !== '') {
 			$div_data .= ' data-delay="' . esc_attr( $animation_delay ) . '"';
@@ -598,6 +648,7 @@ if ($advanced === 'yes') {
 		$lightbox_classes = array();
 		if (!isset($media_link['url']) || $media_link['url'] === '') {
 			$block_data['link_class'] = 'inactive-link';
+			$block_data['no_href'] = true;
 			$block_data['link'] = '#';
 		} else {
 			if ($media_link !== '') {
@@ -617,7 +668,7 @@ if ($advanced === 'yes') {
 
 	if (empty($media) || FALSE === get_post_mime_type( $media )) {
 		if ( !function_exists('vc_is_page_editable') || !vc_is_page_editable() ) {
-			$media_html = '<img src="https://via.placeholder.com/500x500.png?text=media+not+available&amp;w=500&amp;h=500" />';
+			$media_html = '<img class="uncode-missing-media" src="https://via.placeholder.com/500x500.png?text=media+not+available&amp;w=500&amp;h=500" />';
 		} else {
 			$media_html = '';
 		}
@@ -647,7 +698,7 @@ if ($advanced === 'yes') {
 
 	if (empty($media) || FALSE === get_post_mime_type( $media )) {
 		if ( !function_exists('vc_is_page_editable') || !vc_is_page_editable() ) {
-			$media_html = '<div class="t-entry-visual-cont"><img src="https://via.placeholder.com/500x500.png?text=media+not+available&amp;w=500&amp;h=500" /></div>';
+			$media_html = '<div class="t-entry-visual-cont"><img class="uncode-missing-media" src="https://via.placeholder.com/500x500.png?text=media+not+available&amp;w=500&amp;h=500" /></div>';
 		} else {
 			$media_html = '';
 		}
@@ -712,64 +763,14 @@ $output.= wpb_widget_title(array('title' => $title,'extraclass' => 'wpb_singleim
 $output.= $media_string;
 $output.= '</div>';
 if ($caption === 'yes') {
-	if ( $content !== '' ) {
-		$cont_classes = array('heading-text el-text');
-
-		if ($custom_title_font !== '') {
-			$classes[] = $custom_title_font;
-		}
-		if ($custom_title_size !== '') {
-			$classes[] = $custom_title_size;
-			if ($custom_title_size === 'bigtext') {
-				$cont_classes[] = 'heading-bigtext';
-			}
-		}
-		if ($custom_title_height !== '') {
-			$classes[] = $custom_title_height;
-		}
-		if ($custom_title_space !== '') {
-			$classes[] = $custom_title_space;
-		}
-		if ($custom_title_weight !== '') {
-			$classes[] = 'font-weight-' . $custom_title_weight;
-		}
-		if ($custom_title_transform !== '') {
-			$classes[] = 'text-' . $custom_title_transform;
-		}
-
-		$output.= '<figcaption class="' . esc_attr(trim(implode( ' ', $classes ))) . '">';
-		$output .= '<' . $custom_title_semantic . '>';
-		if ($custom_title_italic === 'yes') {
-			$output .= '<i>';
-		}
-		$output .= '<span>';
-		$content = trim($content);
-		$title_lines = explode("\n", $content);
-		$lines_counter = count($title_lines);
-		if ($lines_counter > 1) {
-			foreach ($title_lines as $key => $value) {
-				$value = trim($value);
-				$output .= $value;
-				if ($value !== '' && ($lines_counter - 1 !== $key)) {
-					$output .= '</span><span>';
-				}
-			}
-		} else {
-			$output .= $content;
-		}
-		$output .= '</span>';
-		if ($custom_title_italic === 'yes') {
-			$output .= '</i>';
-		}
-		$output .= '</' . $custom_title_italic . '>';
-
-		$output.= '</figcaption>';
-	} elseif ( isset($media_attributes->post_excerpt) && $media_attributes->post_excerpt !== '' ) {
+	if ( isset($media_attributes->post_excerpt) && $media_attributes->post_excerpt !== '' ) {
 		$output.= '<figcaption>'.$media_attributes->post_excerpt.'</figcaption>';
 	}
-
 }
 $output .= uncode_print_dynamic_inline_style( $inline_style_css );
 $output.= '</div>';
 
 echo uncode_remove_p_tag($output);
+if ( $no_lazy === 'yes' && $lazy === true ) {
+	add_filter( 'uncode_dynamic_srcset_lazy_loading_enabled', '__return_true' );
+}

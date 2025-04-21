@@ -50,8 +50,8 @@ class Fetch_Urls_Task extends Task {
 			'ss_static_pages',
 			Page::query()
 			    ->where( 'last_checked_at < ? OR last_checked_at IS NULL', $this->archive_start_time )
-			    ->limit( $batch_size )
-			    ->find(),
+				->limit( $batch_size )
+				->find(),
 			$this->archive_start_time
 		);
 
@@ -278,7 +278,12 @@ class Fetch_Urls_Task extends Task {
 	 * @return bool
 	 */
 	public function find_excludable( $static_page ) {
-		$excluded = apply_filters( 'ss_excluded_by_default', array( 'wp-json', '.php', 'debug' ) );
+		$excluded = array( 'wp-json', '.php', 'debug' );
+
+		// Exclude feeds if add_feeds is not true.
+		if ( ! $this->options->get( 'add_feeds' ) ) {
+			$excluded[] = 'feed';
+		}
 
 		if ( ! empty( $this->options->get( 'urls_to_exclude' ) ) ) {
 			$excluded_by_option = explode( "\n", $this->options->get( 'urls_to_exclude' ) );
@@ -287,6 +292,8 @@ class Fetch_Urls_Task extends Task {
 				$excluded = array_merge( $excluded, $excluded_by_option );
 			}
 		}
+
+		$excluded = apply_filters( 'ss_excluded_by_default', $excluded );
 
 		if ( $excluded ) {
 			$excluded = array_filter( $excluded );

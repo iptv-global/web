@@ -59,6 +59,11 @@ function uncode_wf_get_wireframe_categories() {
 		'galleries'           => esc_html__( 'Galleries', 'uncode-wireframes' ),
 		'grids'               => esc_html__( 'Grids', 'uncode-wireframes' ),
 		'patterns'            => esc_html__( 'Patterns', 'uncode-wireframes' ),
+		'cards'               => esc_html__( 'Cards', 'uncode-wireframes' ),
+		'shop'                => esc_html__( 'Shop', 'uncode-wireframes' ),
+		'products'            => esc_html__( 'Products', 'uncode-wireframes' ),
+		'cart-checkout'       => esc_html__( 'Cart & Checkout', 'uncode-wireframes' ),
+		'shop-utilities'      => esc_html__( 'Shop Utilities', 'uncode-wireframes' ),
 		'counters'            => esc_html__( 'Counters', 'uncode-wireframes' ),
 		'pricing_tables'      => esc_html__( 'Pricing Tables', 'uncode-wireframes' ),
 		'tabs-accordions'     => esc_html__( 'Tabs Accordions', 'uncode-wireframes' ),
@@ -66,10 +71,6 @@ function uncode_wf_get_wireframe_categories() {
 		'maps'                => esc_html__( 'Maps', 'uncode-wireframes' ),
 		'team_members'        => esc_html__( 'Team Members', 'uncode-wireframes' ),
 		'quotes'              => esc_html__( 'Quotes', 'uncode-wireframes' ),
-		'shop'                => esc_html__( 'Shop', 'uncode-wireframes' ),
-		'products'            => esc_html__( 'Products', 'uncode-wireframes' ),
-		'cart-checkout'       => esc_html__( 'Cart & Checkout', 'uncode-wireframes' ),
-		'shop-utilities'      => esc_html__( 'Shop Utilities', 'uncode-wireframes' ),
 		'specials'            => esc_html__( 'Special', 'uncode-wireframes' ),
 		'navigation'          => esc_html__( 'Navigation', 'uncode-wireframes' ),
 		'carousel-navigation' => esc_html__( 'Carousel Navigation', 'uncode-wireframes' ),
@@ -111,6 +112,7 @@ function uncode_wf_get_wireframe_folders() {
 		'carousel-navigation',
 		'popups',
 		'tabs-accordions',
+		'cards',
 	);
 
 	return $wireframe_folders;

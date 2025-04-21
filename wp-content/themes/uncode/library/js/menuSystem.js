@@ -305,7 +305,6 @@
 
 			appendCTA = function(){
 				if (UNCODE.wwidth < UNCODE.mediaQuery) {
-
 					$ul.after($ulCta);
 				} else {
 					$cta.append($ulCta);
@@ -474,7 +473,7 @@
 								$('.navbar-nav.navbar-main', $menuCont).after('<div class="nav navbar-main-after" />');
 							}
 							$primary_after = $('.nav.navbar-main-after', $menuCont);
-							$primary_after.append('<ul class="menu-smart sm menu-smart-social" />');
+							$primary_after.append('<ul class="menu-smart sm menu-smart-social" role="menu" />');
 						}
 						var tablet_hidden = true,
 							mobile_hidden = true;
@@ -554,7 +553,7 @@
 		}
 		appendSplit();
 
-		$(window).on( 'resize', function(){
+		$(window).on( 'wwresize', function(){
 			clearRequestTimeout(setCTA);
 			setCTA = requestTimeout( function() {
 				appendCTA();
@@ -598,7 +597,7 @@
 	stickyDropdownSearch();
 
 	var setMenuOverlay;
-	$(window).on( 'resize', function(){
+	$(window).on( 'wwResize', function(){
 		if ( $('.overlay').length && $(window).width() > 1024 ) {
 			$('.overlay').addClass('hidden');
 		}
@@ -625,6 +624,10 @@ UNCODE.menuSmartInit = function() {
 		$(this).data('hover', true);
 	}, function(){
 		$(this).data('hover', false);
+	});
+
+	$('> li.menu-item-has-children', $menusmart).each(function(){
+		var $a = $('> a', this).attr('aria-haspopup', 'true').attr('aria-expanded', 'false')
 	});
 
 	$('> li.menu-item a[href="#"]', $menusmart).on('click', function(e){

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Autoload hooks related to image filters.
+ *
+ * @note we require our autoload files everytime and everywhere after plugin load.
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -9,10 +15,12 @@ add_action( 'wp_ajax_vc_media_editor_add_image', 'vc_media_editor_add_image' );
 add_action( 'wp_ajax_vc_media_editor_preview_image', 'vc_media_editor_preview_image' );
 
 /**
+ * Get available filters.
+ *
  * @return array
  */
 function vc_get_filters() {
-	return array(
+	return [
 		'antique' => esc_html__( 'Antique', 'js_composer' ),
 		'blackwhite' => esc_html__( 'Black & White', 'js_composer' ),
 		'boost' => esc_html__( 'Boost', 'js_composer' ),
@@ -34,19 +42,19 @@ function vc_get_filters() {
 		'tender' => esc_html__( 'Tender', 'js_composer' ),
 		'vintage' => esc_html__( 'Vintage', 'js_composer' ),
 		'washed' => esc_html__( 'Washed', 'js_composer' ),
-	);
+	];
 }
 
 /**
  * Add Image Filter field to media uploader
  *
- * @param array $form_fields , fields to include in attachment form
- * @param object $post , attachment record in database
+ * @param array $form_fields , fields to include in attachment form.
+ * @param object $post , attachment record in database.
  *
  * @return array $form_fields, modified form fields
  */
 function vc_attachment_filter_field( $form_fields, $post ) {
-	// don't add filter field, if image already has filter applied
+	// don't add filter field, if image already has filter applied.
 	if ( get_post_meta( $post->ID, 'vc-applied-image-filter', true ) ) {
 		return $form_fields;
 	}
@@ -58,7 +66,7 @@ function vc_attachment_filter_field( $form_fields, $post ) {
 		$html_options .= '<option value="' . esc_attr( $value ) . '">' . esc_html( $title ) . '</option>';
 	}
 
-	$form_fields['vc-image-filter'] = array(
+	$form_fields['vc-image-filter'] = [
 		'label' => '',
 		'input' => 'html',
 		'html' => '
@@ -70,7 +78,7 @@ function vc_attachment_filter_field( $form_fields, $post ) {
 			</div>',
 		'value' => get_post_meta( $post->ID, 'vc_image_filter', true ),
 		'helps' => '',
-	);
+	];
 
 	return $form_fields;
 }
@@ -88,35 +96,34 @@ function vc_attachment_filter_field( $form_fields, $post ) {
  *
  * Optional _POST params:
  * - array filters: mapped array of ids and filters to apply
- *
  */
 function vc_media_editor_add_image() {
 	vc_user_access()->checkAdminNonce()->validateDie()->wpAny( 'upload_files' )->validateDie();
 
 	require_once vc_path_dir( 'HELPERS_DIR', 'class-vc-image-filter.php' );
-	$response = array(
+	$response = [
 		'success' => true,
-		'data' => array(
-			'ids' => array(),
-		),
-	);
+		'data' => [
+			'ids' => [],
+		],
+	];
 
-	$filters = (array) vc_post_param( 'filters', array() );
+	$filters = (array) vc_post_param( 'filters', [] );
 
-	$ids = (array) vc_post_param( 'ids', array() );
+	$ids = (array) vc_post_param( 'ids', [] );
 	if ( ! $ids ) {
 		wp_send_json( $response );
 	}
 
-	// default action is wp_handle_upload, which forces wp to check upload with is_uploaded_file()
-	// override action to anything else to skip security checks
+	// default action is wp_handle_upload, which forces wp to check upload with is_uploaded_file().
+	// override action to anything else to skip security checks.
 	$action = 'vc_handle_upload_imitation';
 
 	$file_key = 0;
 	$post_id = 0;
-	$post_data = array();
-	$overrides = array( 'action' => $action );
-	$_POST = array( 'action' => $action );
+	$post_data = [];
+	$overrides = [ 'action' => $action ];
+	$_POST = [ 'action' => $action ];
 
 	foreach ( $ids as $key => $attachment_id ) {
 		if ( ! empty( $filters[ $attachment_id ] ) ) {
@@ -164,24 +171,24 @@ function vc_media_editor_add_image() {
 			continue;
 		}
 
-		$Filter = new vcImageFilter( $image );
-		$Filter->$filter_name();
+		$filter = new vcImageFilter( $image );
+		$filter->$filter_name();
 
-		if ( ! vc_save_gd_resource( $Filter->getImage(), $temp_path ) ) {
+		if ( ! vc_save_gd_resource( $filter->getImage(), $temp_path ) ) {
 			continue;
 		}
 
 		$new_filename = basename( $temp_path, '.' . $extension ) . '-' . $filter_name . '.' . $extension;
 
-		$_FILES = array(
-			array(
+		$_FILES = [
+			[
 				'name' => $new_filename,
 				'type' => $mime_type,
 				'tmp_name' => $temp_path,
 				'error' => UPLOAD_ERR_OK,
 				'size' => filesize( $temp_path ),
-			),
-		);
+			],
+		];
 
 		$new_attachment_id = media_handle_upload( $file_key, $post_id, $post_data, $overrides );
 
@@ -216,12 +223,12 @@ function vc_media_editor_preview_image() {
 
 	require_once vc_path_dir( 'HELPERS_DIR', 'class-vc-image-filter.php' );
 
-	$response = array(
+	$response = [
 		'success' => true,
-		'data' => array(
+		'data' => [
 			'src' => '',
-		),
-	);
+		],
+	];
 
 	$filter_name = vc_post_param( 'filter', '' );
 	$attachment_id = vc_post_param( 'attachment_id', false );
@@ -253,8 +260,8 @@ function vc_media_editor_preview_image() {
 		wp_send_json( $response );
 	}
 
-	$Filter = new vcImageFilter( $image );
-	$Filter->$filter_name();
+	$filter = new vcImageFilter( $image );
+	$filter->$filter_name();
 
 	$extension = strtolower( pathinfo( $source_path, PATHINFO_EXTENSION ) );
 
@@ -262,15 +269,15 @@ function vc_media_editor_preview_image() {
 	switch ( $extension ) {
 		case 'jpeg':
 		case 'jpg':
-			imagejpeg( $Filter->getImage() );
+			imagejpeg( $filter->getImage() );
 			break;
 
 		case 'png':
-			imagepng( $Filter->getImage() );
+			imagepng( $filter->getImage() );
 			break;
 
 		case 'gif':
-			imagegif( $Filter->getImage() );
+			imagegif( $filter->getImage() );
 			break;
 	}
 
@@ -310,24 +317,24 @@ function vc_get_gd_resource( $file ) {
 /**
  * Save GD resource to file
  *
- * @param resource $resource
+ * @param resource $sd_resource
  * @param string $file
  *
  * @return bool
  */
-function vc_save_gd_resource( $resource, $file ) {
+function vc_save_gd_resource( $sd_resource, $file ) {
 	$extension = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
 
 	switch ( $extension ) {
 		case 'jpeg':
 		case 'jpg':
-			return imagejpeg( $resource, $file );
+			return imagejpeg( $sd_resource, $file );
 
 		case 'png':
-			return imagepng( $resource, $file );
+			return imagepng( $sd_resource, $file );
 
 		case 'gif':
-			return imagegif( $resource, $file );
+			return imagegif( $sd_resource, $file );
 	}
 
 	return false;
@@ -336,8 +343,8 @@ function vc_save_gd_resource( $resource, $file ) {
 /**
  * Add "Filter: ..." meta field to attachment details box
  *
- * @param array $media_meta , meta to include in attachment form
- * @param object $post , attachment record in database
+ * @param array $media_meta , meta to include in attachment form.
+ * @param object $post , attachment record in database.
  *
  * @return array|string
  */

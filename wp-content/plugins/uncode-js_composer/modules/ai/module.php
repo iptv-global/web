@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Module Name: AI
  * Description: Module correspond for all AI related functionality like text generation, translation, etc.
  *
@@ -14,10 +14,11 @@ require_once vc_manager()->path( 'MODULES_DIR', 'ai/class-vc-ai-module-settings.
 
 /**
  * Module entry point.
+ *
  * @since 7.7
  */
-class Vc_Ai_Module
-{
+class Vc_Ai_Module {
+
 	/**
 	 * Settings object.
 	 *
@@ -26,27 +27,34 @@ class Vc_Ai_Module
 	public $settings;
 
 	/**
+	 * Vc_Ai_Module constructor.
+	 *
+	 * @since 8.0
+	 */
+	public function __construct() {
+		$this->settings = new Vc_Ai_Module_Settings();
+		$this->settings->init();
+	}
+
+	/**
 	 * Module init.
 	 *
 	 * @since 7.7
 	 */
 	public function init() {
-		$this->settings = new Vc_Ai_Module_Settings();
-		$this->settings->init();
-
 		require_once vc_path_dir( 'MODULES_DIR', 'ai/helpers.php' );
 
-		add_action( 'wp_ajax_wpb_ai_api_get_response', [$this, 'get_ai_api_response'] );
-		add_action( 'wp_ajax_wpb_ai_generate_content_check_cache', [$this, 'get_generate_ai_content_check_cache'] );
-		add_action( 'wp_ajax_wpb_ai_get_modal_data', [$this, 'get_modal_ai_data'] );
-		add_action( 'wp_ajax_wpb_ai_get_token_usage', [$this, 'get_token_usage_data'] );
+		add_action( 'wp_ajax_wpb_ai_api_get_response', [ $this, 'get_ai_api_response' ] );
+		add_action( 'wp_ajax_wpb_ai_generate_content_check_cache', [ $this, 'get_generate_ai_content_check_cache' ] );
+		add_action( 'wp_ajax_wpb_ai_get_modal_data', [ $this, 'get_modal_ai_data' ] );
+		add_action( 'wp_ajax_wpb_ai_get_token_usage', [ $this, 'get_token_usage_data' ] );
 
-		add_filter( 'vc_single_param_edit_holder_output', [$this, 'add_ai_icon_to_attributes'], 10, 2 );
+		add_filter( 'vc_single_param_edit_holder_output', [ $this, 'add_ai_icon_to_attributes' ], 10, 2 );
 
-		add_filter( 'vc_roles_parts_list', [$this, 'add_ai_role_parts'], 10, 1 );
+		add_filter( 'vc_roles_parts_list', [ $this, 'add_ai_role_parts' ] );
 
-		add_filter( 'vc_get_editor_locale', [$this, 'add_module_localization'], 10, 1 );
-		add_filter( 'vc_get_settings_locale', [$this, 'add_module_localization'], 10, 1 );
+		add_filter( 'vc_get_editor_locale', [ $this, 'add_module_localization' ] );
+		add_filter( 'vc_get_settings_locale', [ $this, 'add_module_localization' ] );
 	}
 
 	/**
@@ -101,7 +109,7 @@ class Vc_Ai_Module
 
 		$data = $modal_controller->get_modal_data( vc_request_param( 'data' ) );
 
-		// in case of error we should show it inside modal content
+		// in case of error we should show it inside modal content.
 		wp_send_json_success( $data );
 	}
 
@@ -159,14 +167,47 @@ class Vc_Ai_Module
 	 */
 	public function render_ai_icon( $param ) {
 		$ai_icon = '';
-		$ai_param_types = $this->get_ai_param_types();
 
+		if ( ! $this->is_user_has_access_to_ai( $param['type'] ) ) {
+			return $ai_icon;
+		}
+
+		$ai_param_types = $this->get_ai_param_types();
 		if ( empty( $param['heading'] ) || ! is_array( $ai_param_types ) ) {
 			return $ai_icon;
 		}
 
+		$is_ai_acceptable_param = in_array( $param['type'], $ai_param_types );
+		$is_output_ai_icon = $is_ai_acceptable_param || $this->is_available_ai_text_field( $param );
+
+		if ( $is_output_ai_icon ) {
+			$ai_icon = wpb_get_ai_icon_template( $param['type'], $this->get_field_id( $param ), false );
+		}
+
+		return $ai_icon;
+	}
+
+	/**
+	 * Get AI icon template with field id arranged
+	 *
+	 * @param array $param
+	 * @return string
+	 */
+	public function get_field_id( $param ) {
+		$field_id = strtolower( preg_replace( '/[^A-Za-z0-9]+/', '_', $param['heading'] ) );
+		return $param['type'] . '_' . $field_id;
+	}
+
+	/**
+	 * Fot a text_filed param type we restrict the AI icon to be shown
+	 * only for specific words in the heading.
+	 *
+	 * @since 8.3
+	 * @param array $param
+	 * @return bool
+	 */
+	public function is_available_ai_text_field( $param ) {
 		$heading = $param['heading'];
-		$is_ai_param = in_array( $param['type'], $ai_param_types );
 		$heading_words = preg_split( '/[\s,]+/', $heading );
 		$is_content = false;
 		foreach ( $heading_words as $word ) {
@@ -176,27 +217,19 @@ class Vc_Ai_Module
 				$is_content = true;
 			}
 		}
-		$is_content_field = 'textfield' === $param['type'] && 'el_class' !== $param['param_name'] && $is_content;
-		if ( ( $is_ai_param || $is_content_field ) && $this->is_user_has_access_to_ai( $param['type'] ) ) {
-			$field_id = empty( $param['heading'] ) ?
-				'' :
-				strtolower( preg_replace( '/[^A-Za-z0-9]+/', '_', $param['heading'] ) );
-			$field_id = $param['type'] . '_' . $field_id;
-			$ai_icon = wpb_get_ai_icon_template( $param['type'], $field_id, false );
-		}
 
-		return $ai_icon;
+		return 'textfield' === $param['type'] && 'el_class' !== $param['param_name'] && $is_content;
 	}
 
 	/**
-	 * Get list of words that element name can
-	 * have to apply AI functionality to than
+	 * Get list of words that text_filed type element name should
+	 * have to apply AI functionality to that.
 	 *
 	 * @since 7.2
 	 * @return array
 	 */
 	public function get_lib_ai_icon_words() {
-		return [
+		$word_list = [
 			'label',
 			'title',
 			'text',
@@ -206,6 +239,8 @@ class Vc_Ai_Module
 			'heading',
 			'subheading',
 		];
+
+		return apply_filters( 'wpb_module_ai_text_field_words', $word_list );
 	}
 
 	/**
@@ -219,6 +254,7 @@ class Vc_Ai_Module
 			'textarea_html',
 			'textarea',
 			'textarea_raw_html',
+			'textarea_ace',
 		];
 		$params_addons = [
 			'uc_textfield',
@@ -228,26 +264,26 @@ class Vc_Ai_Module
 			'us_text',
 		];
 
-		return array_merge( $params, $params_addons );
+		return apply_filters( 'wpb_module_ai_element_param_types', array_merge( $params, $params_addons ) );
 	}
 
 	/**
 	 * Check if user has permission to AI
 	 *
-	 * @param $type
+	 * @param string $type
 	 *
 	 * @return bool
 	 * @since 7.2
 	 */
 	public function is_user_has_access_to_ai( $type ) {
-		return ( 'textarea_raw_html' === $type && vc_user_access()->part( 'code_ai' )->can()->get() ) ||
-			( 'textarea_raw_html' !== $type && vc_user_access()->part( 'text_ai' )->can()->get() );
+		$access_part = ( 'textarea_raw_html' === $type ) ? 'code_ai' : 'text_ai';
+		return vc_user_access()->part( $access_part )->can()->get();
 	}
 
 	/**
 	 * Add AI role parts to our roles manager.
 	 *
-	 *@since 7.7
+	 * @since 7.7
 	 * @param array $parts
 	 * @return array
 	 */

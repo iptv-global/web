@@ -54,6 +54,7 @@ class LS_Uninstaller {
 			'ls_use_custom_jquery',
 			'ls_clear_3rd_party_caches',
 			'ls_admin_no_conflict_mode',
+			'ls_fix_optimizer_issues',
 			'ls_rocketscript_ignore',
 			'ls_suppress_debug_info',
 			'ls_tinymce_helper',
@@ -122,6 +123,17 @@ class LS_Uninstaller {
 			'ls-404-addon-mode',
 			'ls-404-addon-project',
 			'ls-404-addon-background',
+
+			// Maintenance
+			'ls-maintenance-addon-enabled',
+			'ls-maintenance-addon-capability',
+			'ls-maintenance-addon-type',
+			'ls-maintenance-addon-content',
+			'ls-maintenance-addon-project',
+			'ls-maintenance-addon-page',
+			'ls-maintenance-addon-mode',
+			'ls-maintenance-addon-title',
+			'ls-maintenance-addon-background',
 
 			// Legacy
 			'ls-collapsed-boxes',

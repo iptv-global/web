@@ -1,17 +1,20 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	die( '-1' );
-}
-
 /**
+ * Promotional AI modal template.
+ *
  * @var string $logo_template_path
  * @var string $message_template_path
  * @var string $modal_controller
  * @var string $error_message
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	die( '-1' );
+}
 ?>
 
-<div class="wpb-ai-credits-message">
+<div class="vc_ui-helper-popup-promo">
+	<div class="vc_ui-helper-popup-promo--inner">
 		<?php
 
 		vc_include_template( $logo_template_path );

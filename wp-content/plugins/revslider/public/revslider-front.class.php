@@ -187,7 +187,17 @@ class RevSliderFront extends RevSliderFrontGlobal {
 			
 			$slider->init_by_alias($alias, false);
 			if($slider->inited === false) continue;
-			
+
+			if($SR_GLOBALS['use_table_version'] === 7){
+				$v7sid = $slider->get_id();
+				if($this->check_if_migration_done($v7sid) === false){
+					$SR_GLOBALS['use_table_version'] = 6;
+					$slider	= new RevSliderSlider();
+					$slider->init_by_id($v7sid);
+					if($slider->inited === false) continue;
+				}
+			}
+
 			if($SR_GLOBALS['use_table_version'] === 6) $this->v6_slider = true;
 
 			$dl = $slider->get_param('deepLinks', []);

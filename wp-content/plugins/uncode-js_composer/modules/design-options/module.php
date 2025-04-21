@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Module Name: Design Options
  * Description: Add in our setting tab 'Design Options'
  * With fields that helps change colors, sizes etc.
@@ -16,16 +16,28 @@ require_once vc_manager()->path( 'MODULES_DIR', 'design-options/class-vc-design-
 
 /**
  * Module entry point.
+ *
  * @since 7.7
  */
-class Vc_Design_Options_Module
-{
+class Vc_Design_Options_Module {
+
 	/**
 	 * Settings object.
+	 *
 	 * @since 7.7
 	 * @var Vc_Design_Options_Module_Settings
 	 */
 	public $settings;
+
+	/**
+	 * Vc_Design_Options_Module constructor.
+	 *
+	 * @since 8.0
+	 */
+	public function __construct() {
+		$this->settings = new Vc_Design_Options_Module_Settings();
+		$this->settings->init();
+	}
 
 	/**
 	 * Init module implementation.
@@ -33,10 +45,7 @@ class Vc_Design_Options_Module
 	 * @since 7.7
 	 */
 	public function init() {
-		$this->settings = new Vc_Design_Options_Module_Settings();
-		$this->settings->init();
-
-		add_action( 'vc_base_register_front_css', [$this, 'register_from_custom_css_styles'], 11 );
+		add_action( 'vc_base_register_front_css', [ $this, 'register_from_custom_css_styles' ], 11 );
 	}
 
 	/**
@@ -52,7 +61,7 @@ class Vc_Design_Options_Module
 			$front_css_file = $upload_dir['baseurl'] . '/' . $vc_upload_dir . '/js_composer_front_custom.css';
 			$front_css_file = vc_str_remove_protocol( $front_css_file );
 			wp_deregister_style( 'js_composer_front' );
-			wp_register_style( 'js_composer_front', $front_css_file, array(), WPB_VC_VERSION );
+			wp_register_style( 'js_composer_front', $front_css_file, [], WPB_VC_VERSION );
 		}
 	}
 }

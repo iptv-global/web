@@ -35,6 +35,7 @@ class RevSliderShortcodeWizard extends RevSliderFunctions {
 		wp_enqueue_style('revslider-material-icons', RS_PLUGIN_URL_CLEAN . 'sr6/assets/fonts/material/material-icons.css', array(), RS_REVISION);
 		//wp_enqueue_style('revslider-material-icons', RS_PLUGIN_URL_CLEAN . 'admin/assets/icons/material-icons.css', array(), RS_REVISION);
 		wp_enqueue_style('revslider-basics-css', RS_PLUGIN_URL_CLEAN . 'admin/assets/css/basics.css', array(), RS_REVISION);
+		wp_enqueue_style('rs-new-plugin-settings', RS_PLUGIN_URL_CLEAN . 'admin/assets/css/builder.css', array(), RS_REVISION);
 		wp_enqueue_style('rs-color-picker-css', RS_PLUGIN_URL_CLEAN . 'admin/assets/css/tp-color-picker.css', array(), RS_REVISION);
 		wp_enqueue_style('revbuilder-ddTP', RS_PLUGIN_URL_CLEAN . 'admin/assets/css/ddTP.css', array(), RS_REVISION);
 		$f	 			= new RevSliderFunctions();

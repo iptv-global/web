@@ -756,6 +756,10 @@
 					$(document).trigger('uncode-ajax-filtered');
 					$(document.body).trigger('init_price_filter');
 					window.dispatchEvent(new CustomEvent('uncode-ajax-filtered'));
+					window.document.dispatchEvent(new Event("DOMContentLoaded", {
+						bubbles: true,
+						cancelable: true
+					}));
 
 					isAjaxing = false;
 				}
@@ -802,7 +806,7 @@
 
 		UNCODE.lastURL = url;
 
-		if (UNCODE.hasEqualURLParams(params, old_params) || ($.isEmptyObject(params) && $.isEmptyObject(old_params))) {
+		if (UNCODE.hasEqualURLParams(params, old_params) || ($.isEmptyObject(params) && $.isEmptyObject(old_params)) || params.form !== undefined) {
 			return;
 		}
 

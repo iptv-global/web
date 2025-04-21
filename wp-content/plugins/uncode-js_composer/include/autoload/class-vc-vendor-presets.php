@@ -1,4 +1,11 @@
 <?php
+/**
+ * Autoload preset for vendors.
+ *
+ * @note we require our autoload files everytime and everywhere after plugin load.
+ * @since 4.8
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -10,10 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Vc_Vendor_Preset {
 
+	/**
+	 * Instance of Vc_Vendor_Preset
+	 *
+	 * @var Vc_Vendor_Preset
+	 */
 	private static $instance;
-	private static $presets = array();
 
 	/**
+	 * Collection of vendor presets
+	 *
+	 * @var array
+	 */
+	private static $presets = [];
+
+	/**
+	 * Get instance of Vc_Vendor_Preset.
+	 *
 	 * @return \Vc_Vendor_Preset
 	 */
 	public static function getInstance() {
@@ -24,6 +44,9 @@ class Vc_Vendor_Preset {
 		return self::$instance;
 	}
 
+	/**
+	 * Protected constructor.
+	 */
 	protected function __construct() {
 	}
 
@@ -33,23 +56,22 @@ class Vc_Vendor_Preset {
 	 * @param string $title
 	 * @param string $shortcode
 	 * @param array $params
-	 * @param bool $default
+	 * @param bool $default_value
 	 *
 	 * @return bool
 	 * @since 4.8
-	 *
 	 */
-	public function add( $title, $shortcode, $params, $default = false ) {
+	public function add( $title, $shortcode, $params, $default_value = false ) {
 		if ( ! $title || ! is_string( $title ) || ! $shortcode || ! is_string( $shortcode ) || ! $params || ! is_array( $params ) ) {
 			return false;
 		}
 
-		$preset = array(
+		$preset = [
 			'shortcode' => $shortcode,
-			'default' => $default,
+			'default' => $default_value,
 			'params' => $params,
 			'title' => $title,
-		);
+		];
 
 		// @codingStandardsIgnoreLine
 		$id = md5( serialize( $preset ) );
@@ -66,7 +88,6 @@ class Vc_Vendor_Preset {
 	 *
 	 * @return mixed array|false
 	 * @since 4.8
-	 *
 	 */
 	public function get( $id ) {
 		if ( isset( self::$presets[ $id ] ) ) {
@@ -83,10 +104,9 @@ class Vc_Vendor_Preset {
 	 *
 	 * @return array
 	 * @since 4.8
-	 *
 	 */
 	public function getAll( $shortcode ) {
-		$list = array();
+		$list = [];
 
 		foreach ( self::$presets as $id => $preset ) {
 			if ( $shortcode === $preset['shortcode'] ) {
@@ -104,12 +124,11 @@ class Vc_Vendor_Preset {
 	 *
 	 * @return array
 	 * @since 4.8
-	 *
 	 */
 	public function getDefaults() {
-		$list = array();
+		$list = [];
 
-		$added = array();
+		$added = [];
 
 		foreach ( self::$presets as $id => $preset ) {
 			if ( $preset['default'] && ! in_array( $preset['shortcode'], $added, true ) ) {
@@ -130,7 +149,6 @@ class Vc_Vendor_Preset {
 	 *
 	 * @return string|null
 	 * @since 4.8
-	 *
 	 */
 	public function getDefaultId( $shortcode ) {
 		foreach ( self::$presets as $id => $preset ) {

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Connector to AI API.
+ *
+ * @since 7.2
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -32,7 +38,7 @@ class Vc_Ai_Api_Connector {
 	 * @return array
 	 */
 	public function get_ai_type_response_route_lib() {
-		return [
+		return apply_filters( 'wpb_module_ai_type_response_route_lib', [
 			'textarea_html' => [
 				'path' => vc_path_dir( 'MODULES_DIR', 'ai/class-vc-ai-content-generator.php' ),
 				'class' => 'Vc_Ai_Content_Generator',
@@ -80,6 +86,36 @@ class Vc_Ai_Api_Connector {
 					],
 				],
 			],
+			'textarea_ace' => [
+				'path' => [
+					'default' => vc_path_dir( 'MODULES_DIR', 'ai/class-vc-ai-content-generator.php' ),
+					'wpb-ai-element-id' => [
+						'textarea_ace_javascript_code' => vc_path_dir( 'MODULES_DIR', 'ai/class-vc-ai-code-generator.php' ),
+					],
+				],
+				'class' => [
+					'default' => 'Vc_Ai_Content_Generator',
+					'wpb-ai-element-id' => [
+						'textarea_ace_javascript_code' => 'Vc_Ai_Code_Generator',
+					],
+				],
+				'method' => 'generate',
+				'endpoint' => [
+					'default' => 'generate-text',
+					'length' => [
+						'[800,1200]' => 'generate-article',
+						'[400,600]' => 'generate-article',
+						'[10,15]' => 'generate-title',
+					],
+					'contentType' => [
+						'improve_existing' => 'rewrite-text',
+						'translate' => 'translate-text',
+					],
+					'wpb-ai-element-id' => [
+						'textarea_ace_javascript_code' => 'generate-js',
+					],
+				],
+			],
 			'textarea' => [
 				'path' => vc_path_dir( 'MODULES_DIR', 'ai/class-vc-ai-content-generator.php' ),
 				'class' => 'Vc_Ai_Content_Generator',
@@ -119,7 +155,7 @@ class Vc_Ai_Api_Connector {
 				'method' => 'generate',
 				'endpoint' => 'generate-js',
 			],
-		];
+		] );
 	}
 
 	/**
@@ -149,7 +185,8 @@ class Vc_Ai_Api_Connector {
 		$key = vc_license()->getLicenseKey();
 		if ( empty( $key ) ) {
 			return new WP_Error(
-				'ai_error_response', esc_html__( 'WPBakery Page Builder license not activated.', 'js_composer' )
+				'ai_error_response',
+				esc_html__( 'WPBakery Page Builder license not activated.', 'js_composer' )
 			);
 		}
 
@@ -275,27 +312,15 @@ class Vc_Ai_Api_Connector {
 				continue;
 			}
 
-			foreach ( $optionality_value as $modal_form_param_name => $modal_form_param_value ) {
-				$is_value_in_data = array_search( $optionality_name, array_column( $data, 'name' ) );
-
-				if ( false === $is_value_in_data ) {
-					continue;
-				}
-
-				if ( ! isset( $data[ $is_value_in_data ]['value'] ) ) {
-					continue;
-				}
-
-				if ( strval( $modal_form_param_name ) === $data[ $is_value_in_data ]['value'] ) {
-					$resolved = $modal_form_param_value;
-					break;
-				}
+			$endpoint = $this->get_resolved_route_endpoint_optionality( $data, $optionality_name, $optionality_value );
+			if ( false !== $endpoint ) {
+				$resolved = $endpoint;
 			}
 		}
 
 		if ( $resolved ) {
 			return $resolved;
-		} else if ( $default ) {
+		} elseif ( $default ) {
 			return $default;
 		} else {
 			return new WP_Error(
@@ -304,6 +329,38 @@ class Vc_Ai_Api_Connector {
 				'Vc_Ai_Api_Connector::get_ai_type_response_route_lib()'
 			);
 		}
+	}
+
+	/**
+	 * Get resolved endpoint optionality of single route.
+	 *
+	 * @since 7.9
+	 * @param array $data
+	 * @param string $optionality_name
+	 * @param array $optionality_value
+	 * @return bool|string
+	 */
+	public function get_resolved_route_endpoint_optionality( $data, $optionality_name, $optionality_value ) {
+		$endpoint = false;
+
+		foreach ( $optionality_value as $modal_form_param_name => $modal_form_param_value ) {
+			$is_value_in_data = array_search( $optionality_name, array_column( $data, 'name' ) );
+
+			if ( false === $is_value_in_data ) {
+				continue;
+			}
+
+			if ( ! isset( $data[ $is_value_in_data ]['value'] ) ) {
+				continue;
+			}
+
+			if ( strval( $modal_form_param_name ) === $data[ $is_value_in_data ]['value'] ) {
+				$endpoint = $modal_form_param_value;
+				break;
+			}
+		}
+
+		return $endpoint;
 	}
 
 	/**
@@ -386,7 +443,7 @@ class Vc_Ai_Api_Connector {
 	/**
 	 * Get api response data from server cache.
 	 *
-	 * @param $data
+	 * @param array $data
 	 * @return string | WP_Error
 	 * @since 7.2
 	 */
@@ -405,7 +462,7 @@ class Vc_Ai_Api_Connector {
 		}
 
 		if ( isset( $response['message'] ) ) {
-			return $this->get_message_from_data( $response );
+			return $this->get_message_from_data();
 		}
 
 		return $response;
@@ -441,7 +498,7 @@ class Vc_Ai_Api_Connector {
 	 * Check is current process in process of caching.
 	 *
 	 * @since 7.2
-	 * @param $response
+	 * @param array $response
 	 * @return bool
 	 */
 	public function is_cache_response_in_process( $response ) {

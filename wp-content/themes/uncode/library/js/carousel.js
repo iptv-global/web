@@ -215,6 +215,10 @@
 						}, 1000);
 					}
 			  
+					$('.owl-dot', event.currentTarget).each(function(key, val){
+						$(val).attr('aria-label', SiteParameters.uncode_slide_label + ' ' + (key+1));
+					});
+	
 				});
 				//}
 
@@ -270,7 +274,11 @@
 				});
 
 				if (thiis.closest('.uncode-slider').length) {
-					var el = thiis.closest('.row-parent')[0];
+					var el = thiis.closest('.row-parent')[0],
+						section = thiis.closest('.vc_section');
+					if ( section.length ) {
+						el = $('> .row-parent', section)[0];
+					}
 					if ($(el).data('imgready')) {
 						firstLoaded(el, event);
 					} else {
@@ -369,6 +377,9 @@
 					UNCODE.lightgallery( $galleries );
 				}
 
+				if ( typeof ScrollTrigger !== 'undefined' && ScrollTrigger !== null ) {
+					$(document).trigger('uncode-scrolltrigger-refresh');
+				}
 			});
 
 			$elSelector.on('resized.owl.carousel', function(event) {
@@ -404,6 +415,9 @@
 					setTimeout(function(){
 						window.lenis.resize();
 					}, 1000);
+				}
+				if ( typeof ScrollTrigger !== 'undefined' && ScrollTrigger !== null ) {
+					$(document).trigger('uncode-scrolltrigger-refresh');
 				}
 			});
 
@@ -545,8 +559,9 @@
 				fluidSpeed: true,
 				navSpeed: values['navspeed'],
 				dotsSpeed: values['navspeed'] / values['items'],
+				navElement: ['button type="button" role="presentation" aria-label="' + SiteParameters.uncode_prev_label + '"', 'button type="button" role="presentation" aria-label="' + SiteParameters.uncode_next_label + '"'],
 				navClass: [ 'owl-prev'+values['navskin'], 'owl-next'+values['navskin'] ],
-				navText: ['<div class="owl-nav-container btn-default btn-hover-nobg"><i class="fa fa-fw fa-angle-left"></i></div>', '<div class="owl-nav-container btn-default btn-hover-nobg"><i class="fa fa-fw fa-angle-right"></i></div>'],
+				navText: ['<div class="owl-nav-container btn-default btn-hover-nobg" tabindex="0"><i class="fa fa-fw fa-angle-left"></i></div>', '<div class="owl-nav-container btn-default btn-hover-nobg" aria-label="' + SiteParameters.uncode_next_label + '" tabindex="0"><i class="fa fa-fw fa-angle-right"></i></div>'],
 				navContainer: values['nav'] && ! SiteParameters.is_frontend_editor ? $elSelector : false,
 				responsiveClass: true,
 				responsiveBaseElement: '.box-container',

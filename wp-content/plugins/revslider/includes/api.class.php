@@ -165,7 +165,10 @@ class RevSliderApi extends RevSliderFunctions {
 				 * new to v7 calls
 				 **/
 				case 'save_slider_v7':
-					$this->save_slider();
+					$this->save_slider_v7();
+				break;
+				case 'save_slide_v7':
+					$this->save_slide_v7();
 				break;
 				case 'clear_v7_tables':
 					$this->truncate_v7_tables();
@@ -1817,7 +1820,41 @@ class RevSliderApi extends RevSliderFunctions {
 		$this->ajax_response_success(__('V7 Tables Cleared', 'revslider'));
 	}
 
-	public function save_slider($data = false){
+	public function save_slide_v7($data = false){
+		global $SR_GLOBALS;
+		$this->check_nonce();
+
+		$slider		= new RevSliderSlider();
+		$slide		= new RevSliderSlide();
+		$data		= $this->get_data($data);
+		$slider_id	= $this->get_val($data, 'id');
+		$slide_data	= $this->get_val($data, 'slides');
+		$slide_data	= $this->json_decode_slashes($slide_data);
+
+		if($this->_truefalse($this->get_val($data, 'fromSR6')) === true){
+			$SR_GLOBALS['use_table_version'] = 7;
+
+			$id = $this->get_val($slide_data, ['slide', 'id'], false);
+			if($id === false || intval($id) === 0) $this->ajax_response_error(__('Slide could not be saved as a V7 Slide', 'revslider'));
+			$slide->save_slide_v7($id, $slide_data, $slider_id);
+			
+			$v6_slide_id = $this->get_v6_slide_by_v7_id($id);
+			if($v6_slide_id !== false){
+				$upd = RevSliderGlobals::instance()->get('RevSliderPluginUpdate');
+				$upd->update_post_slide_template_v7($v6_slide_id);
+			}
+			$SR_GLOBALS['use_table_version'] = 6;
+		}else{
+			$this->ajax_response_error(__('Slide could not be saved as a V7 Slide, fromSR6 is missing!', 'revslider'));
+		}
+
+		$cache = RevSliderGlobals::instance()->get('RevSliderCache');
+		$cache->clear_transients_by_slider($slider_id);
+		
+		$this->ajax_response_success(__('Slide Saved as a V7 Slide', 'revslider'));
+	}
+
+	public function save_slider_v7($data = false){
 		global $SR_GLOBALS;
 		$this->check_nonce();
 
@@ -1825,8 +1862,6 @@ class RevSliderApi extends RevSliderFunctions {
 		$slide		 = new RevSliderSlide();
 		$data		 = $this->get_data($data);
 		$slider_id	 = $this->get_val($data, 'id');
-		$slides_data = $this->get_val($data, 'slides');
-		$slides_data = $this->json_decode_slashes($slides_data);
 		
 		if($this->_truefalse($this->get_val($data, 'fromSR6')) === true){
 			$SR_GLOBALS['use_table_version'] = 7;
@@ -1835,26 +1870,16 @@ class RevSliderApi extends RevSliderFunctions {
 			$alias			 = $this->get_val($data, 'alias');
 			$slider_data	 = $this->get_val($data, 'settings');
 			$slider_id		 = $slider->save_slider_v7($slider_id, $slider_data, $title, $alias);
-			//probably kill all v7 slides here first
-			if(!empty($slides_data)){
-				foreach($slides_data as $id => $_slide){
-					$slide->save_slide_v7($id, $_slide, $slider_id);
-				}
-			}
+			
 			$SR_GLOBALS['use_table_version'] = 6;
 		}else{
 			$slider_id		 = $slider->save_slider($slider_id, $data);
-			if(!empty($slides_data)){
-				foreach($slides_data as $id => $_slide){
-					$slide->save_slide($id, $_slide, $slider_id);
-				}
-			}
 		}
 
 		$cache = RevSliderGlobals::instance()->get('RevSliderCache');
 		$cache->clear_transients_by_slider($slider_id);
 		
-		$this->ajax_response_success(__('Slider Saved as V7 Slider', 'revslider'));
+		$this->ajax_response_success(__('Slider Saved as a V7 Slider', 'revslider'));
 	}
 	
 	public function set_v7_migration_failed($data = false){
@@ -2027,47 +2052,34 @@ class RevSliderApi extends RevSliderFunctions {
 			}
 		}
 
-		if($SR_GLOBALS['use_table_version'] !== 7){
-			if($slider_alias !== ''){
-				$slider->init_by_alias($slider_alias);
-				$slider_id = $slider->get_id();
-			}else{
-				if(strpos($slide_id, 'slider-') !== false){
-					$slider_id = str_replace('slider-', '', $slide_id);
-				}else{
-					$slide->init_by_id($slide_id);
-
-					$slider_id = $slide->get_slider_id();
-					if(intval($slider_id) == 0){
-						$this->ajax_response_error(__('Slider could not be loaded', 'revslider'));
-					}
-				}
-				
-				$slider->init_by_id($slider_id);
-			}
-
-			if($slider->inited === false) $this->ajax_response_error(__('Slider could not be loaded', 'revslider'));
-
+		$error = ($SR_GLOBALS['use_table_version'] !== 7) ? __('Slider could not be loaded', 'revslider') : __('V7 Slider could not be found', 'revslider');
+		if($slider_alias !== ''){
+			$slider->init_by_alias($slider_alias);
+			$slider_id = $slider->get_id();
 		}else{
-			if($slider_alias !== ''){
-				$slider->init_by_alias($slider_alias);
-				$slider_id = $slider->get_id();
+			if(strpos($slide_id, 'slider-') !== false){
+				$slider_id = str_replace('slider-', '', $slide_id);
 			}else{
-				if(strpos($slide_id, 'slider-') !== false){
-					$slider_id = str_replace('slider-', '', $slide_id);
-				}else{
-					$slide->init_by_id($slide_id);
+				$slide->init_by_id($slide_id);
 
-					$slider_id = $slide->get_slider_id();
-					if(intval($slider_id) == 0){
-						$this->ajax_response_error(__('V7 Slider could not be found', 'revslider'));
-					}
+				$slider_id = $slide->get_slider_id();
+				if(intval($slider_id) == 0){
+					$this->ajax_response_error($error);
 				}
-				$slider->init_by_id($slider_id);
 			}
+			$slider->init_by_id($slider_id);
+		}
 
-			if($slider->inited === false) $this->ajax_response_error(__('V7 Slider could not inited', 'revslider'));
+		if($slider->inited === false) $this->ajax_response_error($error);
 
+		if($SR_GLOBALS['use_table_version'] === 7){
+			$v7sid = $slider->get_id();
+			if($this->check_if_migration_done($v7sid) === false){
+				$SR_GLOBALS['use_table_version'] = 6;
+				$slider	= new RevSliderSlider();
+				$slider->init_by_id($v7sid);
+				if($slider->inited === false) $this->ajax_response_error($error);
+			}
 		}
 
 		$JSON = $slider->get_full_slider_JSON(false, true, $slide_ids, array(), $raw, $modify);

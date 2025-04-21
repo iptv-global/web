@@ -1,4 +1,11 @@
 <?php
+/**
+ * Autoload notice controller.
+ *
+ * @note we require our autoload files everytime and everywhere after plugin load.
+ * @since 7.0
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -14,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Vc_Notice_Controller {
 	/**
 	 * Notification API URL.
+	 *
 	 * @version 7.0
 	 * @var string
 	 */
@@ -43,7 +51,11 @@ class Vc_Notice_Controller {
 			$this,
 			'init',
 		] );
-		add_action( 'wp_ajax_wpb_add_notice_to_close_list', [ $this, 'add_notice_to_close_list' ] );
+
+		add_action( 'wp_ajax_wpb_add_notice_to_close_list', [
+			$this,
+			'add_notice_to_close_list',
+		] );
 	}
 
 	/**
@@ -110,11 +122,11 @@ class Vc_Notice_Controller {
 			return false;
 		}
 
-		if ( ! $this->is_notice_version_valid( $notice, WPB_VC_VERSION ) ) {
+		if ( ! $this->is_notice_version_valid( $notice ) ) {
 			return false;
 		}
 
-        // phpcs:ignore
+		// phpcs:ignore
 		if ( ! $this->is_notice_date_valid( $notice, current_time( 'timestamp' ) ) ) {
 			return false;
 		}
@@ -152,10 +164,10 @@ class Vc_Notice_Controller {
 	 *
 	 * @since 7.0
 	 * @param array $notice
-	 * @param string $current_version
+	 * @param string | false $current_version
 	 * @return bool
 	 */
-	public function is_notice_version_valid( $notice, $current_version ) {
+	public function is_notice_version_valid( $notice, $current_version = false ) {
 
 		$result = false;
 
@@ -169,6 +181,15 @@ class Vc_Notice_Controller {
 
 		if ( ! $is_versions_value_valid ) {
 			return $result;
+		}
+
+		if ( ! $current_version ) {
+			if ( ! function_exists( 'get_plugin_data' ) ) {
+				return $result;
+			}
+
+			$plugin_data = get_plugin_data( WPB_PLUGIN_FILE );
+			$current_version = $plugin_data['Version'];
 		}
 
 		$is_version_inside_diapason =
@@ -198,8 +219,8 @@ class Vc_Notice_Controller {
 		}
 
 		$is_date_inside_diapason =
-			($current_time >= strtotime( $notice['date_from'] ) ) &&
-			($current_time <= strtotime( $notice['date_to'] ) );
+			( $current_time >= strtotime( $notice['date_from'] ) ) &&
+			( $current_time <= strtotime( $notice['date_to'] ) );
 
 		if ( $is_date_inside_diapason ) {
 			$result = true;
@@ -212,16 +233,16 @@ class Vc_Notice_Controller {
 	 * Check if notice has content that we can show to user.
 	 *
 	 * @since 7.0
-	 * @param $notice
+	 * @param array $notice
 	 * @return bool
 	 */
 	public function is_notice_content_valid( $notice ) {
-		// notice always should have id
+		// notice always should have id.
 		if ( empty( $notice['id'] ) ) {
 			return false;
 		}
 
-		// notice should have at least one element to show
+		// notice should have at least one element to show.
 		$is_notice_content_empty =
 			empty( $notice['title'] ) &&
 			empty( $notice['description'] ) &&
@@ -270,6 +291,8 @@ class Vc_Notice_Controller {
 
 	/**
 	 * Check if api response is empty.
+	 *
+	 * @param mixed $notice_list
 	 */
 	public function is_api_response_empty( $notice_list ) {
 		return is_array( $notice_list ) && isset( $notice_list['empty_api_response'] );
@@ -282,8 +305,8 @@ class Vc_Notice_Controller {
 	 */
 	public function save_notice_list_to_transient( $notice_list ) {
 		if ( ! $this->is_notice_list_valid( $notice_list ) ) {
-			// in case if we have invalid notice list we save false value
-			// to transient to prevent requests to our API more than 12 hours
+			// in case if we have invalid notice list we save false value.
+			// to transient to prevent requests to our API more than 12 hours.
 			$empty = [ 'empty_api_response' => true ];
 			set_transient( $this->transient_notice_list, $empty, 12 * HOUR_IN_SECONDS );
 			return;
@@ -314,6 +337,7 @@ class Vc_Notice_Controller {
 
 	/**
 	 * Get notices from notice API.
+	 *
 	 * @note we fire up request to our API once per 12 hours.
 	 *
 	 * @since 7.0
@@ -322,7 +346,7 @@ class Vc_Notice_Controller {
 	public function get_notice_list_from_api_request() {
 		$empty_notice_list = '';
 
-		$response = wp_remote_get( $this->notification_api_url, [ 'timeout' => 30 ] );
+		$response = wp_remote_get( $this->build_request_url(), [ 'timeout' => 30 ] );
 
 		if ( is_wp_error( $response ) ) {
 			return $empty_notice_list;
@@ -341,6 +365,23 @@ class Vc_Notice_Controller {
 		}
 
 		return $notice_list;
+	}
+
+	/**
+	 * Add license key and theme license parameters if it is activated
+	 *
+	 * @return string
+	 */
+	public function build_request_url() {
+		if ( vc_license()->isActivated() ) {
+			return add_query_arg( 'license_key', vc_license()->getLicenseKey(), $this->notification_api_url );
+		}
+
+		if ( vc_is_as_theme() ) {
+			return add_query_arg( 'theme_activated', '1', $this->notification_api_url );
+		}
+
+		return $this->notification_api_url;
 	}
 
 	/**
@@ -366,7 +407,7 @@ class Vc_Notice_Controller {
 	/**
 	 * Save notice to close list.
 	 *
-	 * @param $notice_id
+	 * @param int $notice_id
 	 * @return int|bool
 	 */
 	public function save_notice_to_close_list( $notice_id ) {

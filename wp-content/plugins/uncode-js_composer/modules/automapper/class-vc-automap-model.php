@@ -1,4 +1,8 @@
 <?php
+/**
+ * Automapper model.
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -14,52 +18,65 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 	class Vc_Automap_Model {
 		/**
 		 * Option name for storing modules option.
+		 *
 		 * @since 7.7
 		 * @var string
 		 */
 		protected static $option_name = 'vc_automapped_shortcodes';
 		/**
 		 * Option data for storing modules option.
+		 *
 		 * @since 7.7
 		 * @var array
 		 */
 		protected static $option_data;
 		/**
 		 * Shortcode id.
+		 *
 		 * @since 7.7
 		 * @var array|bool
 		 */
 		public $id = false;
 		/**
 		 * Shortcode tag.
+		 *
 		 * @since 7.7
 		 * @var string
 		 */
 		public $tag;
 		/**
 		 * Shortcode data.
+		 *
 		 * @since 7.7
 		 * @var mixed
 		 */
 		protected $data;
 		/**
 		 * Shortcode vars.
+		 *
 		 * @since 7.7
 		 * @var array
 		 */
-		protected $vars = array(
+		protected $vars = [
 			'tag',
 			'name',
 			'category',
 			'description',
 			'params',
-		);
+		];
+
+		/**
+		 * Shortcode name.
+		 *
+		 * @var string
+		 */
 		public $name;
 
 		/**
 		 * Vc_Automap_Model constructor.
+		 *
+		 * @param array $data
 		 * @since 7.7
-		 * @param $data
 		 */
 		public function __construct( $data ) {
 			$this->loadOptionData();
@@ -74,12 +91,13 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 
 		/**
 		 * Find all mapped shortcodes.
+		 *
 		 * @since 7.7
 		 * @return array
 		 */
 		public static function findAll() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 			self::loadOptionData();
-			$records = array();
+			$records = [];
 			foreach ( self::$option_data as $id => $record ) {
 				$record['id'] = $id;
 				$model = new self( $record );
@@ -93,6 +111,7 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 
 		/**
 		 * Find shortcode by tag.
+		 *
 		 * @since 7.7
 		 * @return array|mixed
 		 */
@@ -101,7 +120,7 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 				self::$option_data = get_option( self::$option_name );
 			}
 			if ( ! self::$option_data ) {
-				self::$option_data = array();
+				self::$option_data = [];
 			}
 
 			return self::$option_data;
@@ -109,14 +128,15 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 
 		/**
 		 * Get shortcode by key.
+		 *
 		 * @since 7.7
-		 * @param $key
+		 * @param string $key
 		 *
 		 * @return mixed
 		 */
 		public function get( $key ) {
 			if ( is_null( $this->data ) ) {
-				$this->data = isset( self::$option_data[ $this->id ] ) ? self::$option_data[ $this->id ] : array();
+				$this->data = isset( self::$option_data[ $this->id ] ) ? self::$option_data[ $this->id ] : [];
 			}
 
 			return isset( $this->data[ $key ] ) ? $this->data[ $key ] : null;
@@ -126,8 +146,8 @@ if ( ! class_exists( 'Vc_Automap_Model' ) ) {
 		 * Set shortcode by key.
 		 *
 		 * @since 7.7
-		 * @param $attr
-		 * @param $value
+		 * @param mixed $attr
+		 * @param mixed $value
 		 */
 		public function set( $attr, $value = null ) {
 			if ( is_array( $attr ) ) {

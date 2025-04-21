@@ -381,6 +381,9 @@
 							container.trigger('more-items-loaded');
 							$(window).trigger('more-items-loaded');
 							window.dispatchEvent(new CustomEvent('uncode-more-items-loaded'));
+							if ( typeof ScrollTrigger !== 'undefined' && ScrollTrigger !== null ) {
+								$(document).trigger('uncode-scrolltrigger-refresh');
+							}
 						}, 2000);
 
 					}, delay);

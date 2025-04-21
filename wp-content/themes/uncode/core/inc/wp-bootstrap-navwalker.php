@@ -20,7 +20,7 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 	 * @param int $depth Depth of page. Used for padding.
 	 */
 	public function start_lvl( &$output, $depth = 0, $args = array() ) {
-		global $megamenu, $megachildren, $el_counter;
+		global $megamenu, $megachildren;
 
 		$indent = str_repeat( "\t", $depth );
 		if ( $megamenu == 'megamenu' ) {
@@ -69,7 +69,7 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 	 * @param object $args
 	 */
 	public function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-		global $megamenu, $megachildren, $wpdb, $menutype, $el_counter;
+		global $megamenu, $megachildren, $wpdb, $menutype;
 
 		$description = '';
 		$icon_html = '';
@@ -115,13 +115,6 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 			$badge_html = uncode_print_menu_badge_item( $item );
 		}
 
-		$span_counter = '';
-
-		// if ($depth === 0) {
-		// 	$el_counter++;
-		// 	$span_counter = '<span class="nav-menu-item-counter">' . esc_html( sprintf( '%02d', $el_counter ) ) . '</span>';
-		// }
-
 		/**
 		 * Dividers, Headers or Disabled
 		 * =============================
@@ -137,12 +130,7 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 		} else if ( ! is_null( $item->attr_title ) && strcasecmp( $item->attr_title, 'dropdown-header') == 0 && $depth === 1 ) {
 			$output .= $indent . '<li role="presentation" class="dropdown-header">' . esc_attr( $item->title );
 		} else if ( ! is_null( $item->attr_title ) && strcasecmp($item->attr_title, 'disabled' ) == 0 ) {
-			$output .= $indent . '<li role="presentation" class="disabled"><a href="#"><span>' . esc_attr( $item->title ) . $span_counter . '</span></a>';
-		} else if ( ! is_null( $item->megamenu ) && strcasecmp($item->megamenu, 'megamenu' ) == 0 && $depth === 0 ) {
-			$classes = empty( $item->classes ) ? array() : (array) $item->classes;
-			$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
-			$class_names = $class_names ? ' ' . esc_attr( $class_names ) : '';
-			$output .= $indent . '<li class="mega-menu'.$class_names.'"><a href="'.(! empty( $item->url ) ? $item->url : '#').'">'  . $icon_html . esc_attr( $item->title ) . $badge_html . '<i class="fa fa-angle-down fa-dropdown"></i>' . $description . $span_counter . '</a>';
+			$output .= $indent . '<li role="presentation" class="disabled"><a href="#"><span>' . esc_attr( $item->title ) . '</span></a>';
 		} else {
 
 			$class_names = $value = '';
@@ -165,10 +153,6 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 			}
 
 			if ($item->button) {
-				if ($depth === 0) {
-					$el_counter--;
-					$span_counter = '';
-				}
 				$classes[] = 'btn';
 			} else {
 				if ($depth === 0) {
@@ -183,10 +167,17 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 			$raw_id = intval( $item->ID );
 			$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
 
-			$output .= $indent . '<li' . $id . $value . (!$item->button ? $class_names : ' class="menu-item-button"') . '>';
+			if ( ! is_null( $item->megamenu ) && strcasecmp($item->megamenu, 'megamenu' ) == 0 && $depth === 0 ) {
+				$classes = empty( $item->classes ) ? array() : (array) $item->classes;
+				$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
+				$class_names = $class_names ? ' ' . esc_attr( $class_names ) : '';
+				$output .= $indent . '<li role="menuitem"' . $id . ' class="mega-menu'.$class_names.'">';
+			} else {
+				$output .= $indent . '<li role="menuitem" ' . $id . $value . (!$item->button ? $class_names : ' class="menu-item-button"') . '>';
+			}
 
 			$atts = array();
-			$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : (! empty( $item->title )	? $item->title	: '');
+			$atts['title']  = ! empty( $item->attr_title ) ? $item->attr_title : '';
 			$atts['target'] = ! empty( $item->target )	? $item->target	: '';
 			$atts['rel']    = ! empty( $item->xfn )		? $item->xfn	: '';
 
@@ -201,6 +192,10 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 
 			if ( $badge_html ) {
 				$atts['class'] = isset( $atts['class'] ) ? $atts['class'] . ' has-badge' : 'has-badge';
+			}
+
+			if ( ( !isset($atts['role']) || $atts['role'] === '' ) && ( empty( $item->url ) || $item->url === '#' ) ) {
+				$atts['role'] = 'button';
 			}
 
 			$atts = apply_filters( 'nav_menu_link_attributes', $atts, $item, $args );
@@ -230,10 +225,10 @@ class wp_bootstrap_navwalker extends Walker_Nav_Menu {
 				}
 
 				if ($item->button) {
-					$item_output .= '<div class="menu-btn-table"><div class="menu-btn-cell"><div'.$class_names.'><span>' . $args->link_before . ( ! empty( $item->icon ) ? '<i class="menu-icon ' . esc_attr( $item->icon ) . '"></i>' : '') . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after . '</span></div></div></div>' . $badge_html . $description . $span_counter . '</a>';
+					$item_output .= '<div class="menu-btn-table"><div class="menu-btn-cell"><div'.$class_names.'><span>' . $args->link_before . ( ! empty( $item->icon ) ? '<i class="menu-icon ' . esc_attr( $item->icon ) . '"></i>' : '') . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after . '</span></div></div></div>' . $badge_html . $description . '</a>';
 				} else {
 					$item_output .= $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $badge_html . $args->link_after;
-					$item_output .= ( $args->has_children) ? '<i class="fa fa-angle-down fa-dropdown"></i>' . $description . $span_counter . '</a>' : '<i class="fa fa-angle-right fa-dropdown"></i>' . $description . $span_counter . '</a>';
+					$item_output .= ( $args->has_children) ? '<i class="fa fa-angle-down fa-dropdown"></i>' . $description . '</a>' : '<i class="fa fa-angle-right fa-dropdown"></i>' . $description . '</a>';
 				}
 			} else {
 				$item_output .= $item->title;

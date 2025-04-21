@@ -3,9 +3,12 @@
 
 	var marqueeAttempts = 0,
 	marqueeTO,
-	marqueeCheckResize;
+	marqueeCheckResize,
+	initMarquee;
 
 UNCODE.textMarquee = function( $titles ) {
+
+	var isInitMarque = false;
 
 	var initTextMarquee = function( $titles ){
 
@@ -17,6 +20,8 @@ UNCODE.textMarquee = function( $titles ) {
 			return;
 		}
 
+		isInitMarque = true;
+
 		var stableHeight = UNCODE.wheight;
 
 		$titles.each(function(){
@@ -27,12 +32,14 @@ UNCODE.textMarquee = function( $titles ) {
 				dataSpeed = parseFloat( $title.closest('.heading-text').attr('data-marquee-speed') ),
 				dataSpace = parseFloat( $title.closest('.heading-text').attr('data-marquee-space') ),
 				dataTrigger = $title.closest('.heading-text').attr('data-marquee-trigger'),
+				hasSticky = false,
 				dataNavBar = $title.closest('.heading-text').attr('data-marquee-navbar'),
 				dataNavBarMobile = $title.closest('.heading-text').attr('data-marquee-navbar-mobile'),
 				newW = UNCODE.wwidth,
 				marqueeTL, inview;
 
 			if ( $title.closest('.sticky-trigger').length || $title.closest('.sticky-element').length || $title.closest('.pin-spacer').length ) {
+				hasSticky = true;
 				dataTrigger = 'row';
 			}
 
@@ -90,9 +97,10 @@ UNCODE.textMarquee = function( $titles ) {
 					translX;
 
 				marqueeTL = new TimelineMax({ paused: true, reversed: true });
+				marqueeTL.play();
 
 				var inViewElement =
-						dataTrigger === "row" ? $title.closest('.sticky-trigger, .sticky-element').parent()[0] : $title[0],
+						dataTrigger === "row" ? ( hasSticky ? $title.closest('.sticky-trigger, .sticky-element').parent()[0] : $title.closest(".vc_row")[0] ) : $title[0],
 					wayOff =
 						dataTrigger === "row" && dataNavBar === "yes"
 							? UNCODE.menuHeight
@@ -152,6 +160,12 @@ UNCODE.textMarquee = function( $titles ) {
 						first = false;
 						continuousTextMarquee();
 					},
+					onUpdate: function(){
+						if ( ! $title[0].isConnected ) {
+							marqueeTL.kill();
+							initTextMarquee();
+						}
+					},
 					ease: ease
 				});
 		
@@ -161,8 +175,11 @@ UNCODE.textMarquee = function( $titles ) {
 				var time = Date.now();
 
 				var textMarqueeScroll = function(){
-					var $row = $title.closest('.sticky-trigger, .sticky-element').parent(),
-						$bound = (dataTrigger === 'row' || dataTrigger === 'row-middle') ? $row : $title;
+					var $row = $title.closest('.vc_row');
+					if ( hasSticky ) {
+						$row = $title.closest('.sticky-trigger, .sticky-element').parent();
+					}					
+					var $bound = (dataTrigger === 'row' || dataTrigger === 'row-middle') ? $row : $title;
 
 					if ( !$bound.length ) {
 						return;
@@ -277,8 +294,10 @@ UNCODE.textMarquee = function( $titles ) {
 				}, 1000);
 			};
 
-			$(window).off('resize uncode.re-layout', marqueeResize)
-			.on( 'resize uncode.re-layout', marqueeResize);
+			$(window).off('resize', marqueeResize)
+			.on( 'resize', marqueeResize);
+			$(window).off('uncode.re-layout', marqueeResize)
+			.on( 'uncode.re-layout', marqueeResize);
 
 			cloneSpan($title, txt);
 
@@ -300,13 +319,18 @@ UNCODE.textMarquee = function( $titles ) {
 	};
 
 	document.addEventListener("DOMContentLoaded", function() {
-		initTextMarquee();
+		if ( isInitMarque !== true ) {
+			initTextMarquee();
+		}
 	});
 
-	$(window).on('focus',function(){
-		setTimeout(function(){
-			initTextMarquee();
-		},500);
+	$(window).on('focus load resize',function(){
+		clearTimeout(initMarquee);
+		initMarquee = setTimeout(function(){
+			if ( isInitMarque !== true ) {
+				initTextMarquee();
+			}
+		}, 500);
 	});
 	
 	$(document).on('pumAfterOpen pumAfterClose', function(args){
@@ -314,6 +338,6 @@ UNCODE.textMarquee = function( $titles ) {
 	});
 
 };
-
+	
 
 })(jQuery);

@@ -3,7 +3,7 @@
  * Plugin Name:       Uncode Wireframes
  * Plugin URI:        https://undsgn.com/uncode/
  * Description:       Wireframes library for Uncode.
- * Version:           1.7.1
+ * Version:           1.8.0
  * Author:            Uncode
  * Author URI:        https://undsgn.com/
  * Requires at least: 4.4
@@ -27,7 +27,7 @@ final class Uncode_Wireframes {
 	/**
 	 * @var string
 	 */
-	public $version = '1.7.1';
+	public $version = '1.8.0';
 
 	/**
 	 * @var Uncode_Wireframes The single instance of the class

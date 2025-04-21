@@ -1,4 +1,4 @@
-# Copyright (C) 2024 Uncode Privacy
+# Copyright (C) 2025 Uncode Privacy
 # This file is distributed under the same license as the Uncode Privacy package.
 msgid ""
 msgstr ""
@@ -75,31 +75,31 @@ msgstr ""
 msgid "No logs found."
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:155, ../includes/class-uncode-toolkit-privacy-public.php:272
+#: ../includes/class-uncode-toolkit-privacy-public.php:159, ../includes/class-uncode-toolkit-privacy-public.php:276
 msgid "Accept All"
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:155, ../includes/class-uncode-toolkit-privacy-public.php:272
+#: ../includes/class-uncode-toolkit-privacy-public.php:159, ../includes/class-uncode-toolkit-privacy-public.php:276
 msgid "I Agree"
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:157, ../includes/class-uncode-toolkit-privacy-public.php:283
+#: ../includes/class-uncode-toolkit-privacy-public.php:161, ../includes/class-uncode-toolkit-privacy-public.php:287
 msgid "Reject All"
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:188
+#: ../includes/class-uncode-toolkit-privacy-public.php:192
 msgid "We could not verify the the security token. Please try again."
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:236, ../includes/uncode-toolkit-privacy-helper-functions.php:88, ../includes/views/public/privacy-bar.php:23, ../includes/views/public/privacy-preferences-modal.php:16
+#: ../includes/class-uncode-toolkit-privacy-public.php:240, ../includes/uncode-toolkit-privacy-helper-functions.php:90, ../includes/views/public/privacy-bar.php:23, ../includes/views/public/privacy-preferences-modal.php:16
 msgid "Privacy Preferences"
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:240, ../includes/views/public/privacy-preferences-modal.php:61
+#: ../includes/class-uncode-toolkit-privacy-public.php:244, ../includes/views/public/privacy-preferences-modal.php:61
 msgid "Save Preferences"
 msgstr ""
 
-#: ../includes/class-uncode-toolkit-privacy-public.php:250, ../includes/views/public/privacy-preferences-modal.php:63
+#: ../includes/class-uncode-toolkit-privacy-public.php:254, ../includes/views/public/privacy-preferences-modal.php:63
 msgid "Privacy Policy"
 msgstr ""
 

@@ -11,6 +11,9 @@
 		UNCODE.betterResize();
 		UNCODE.utils();
 		UNCODE.magnetic();
+		if (typeof UNCODE.accessibility !== 'undefined') {
+			UNCODE.accessibility();
+		}
 		if (typeof UNCODE.rowParallax !== 'undefined') {
 			UNCODE.rowParallax();
 		}
@@ -144,6 +147,12 @@
 		}
 		if (typeof UNCODE.stickyTrigger !== 'undefined') {
 			UNCODE.stickyTrigger();
+		}
+		if (typeof UNCODE.areaTextReveal !== 'undefined') {
+			UNCODE.areaTextReveal();
+		}
+		if (typeof UNCODE.thumbsReveal !== 'undefined') {
+			UNCODE.thumbsReveal();
 		}
 		if (typeof UNCODE.verticalText !== 'undefined') {
 			UNCODE.verticalText();

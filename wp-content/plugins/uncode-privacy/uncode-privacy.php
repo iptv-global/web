@@ -3,7 +3,7 @@
  * Plugin Name:       Uncode Privacy
  * Plugin URI:        https://undsgn.com/
  * Description:       Privacy toolkit for Undsgn themes.
- * Version:           2.2.4
+ * Version:           2.2.5
  * Author:            Undsgn
  * Author URI:        https://undsgn.com/
  * Requires at least: 4.0
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin version.
  */
-define( 'UNCODE_TOOLKIT_PRIVACY_VERSION', '2.2.4' );
+define( 'UNCODE_TOOLKIT_PRIVACY_VERSION', '2.2.5' );
 
 if ( ! defined( 'UNCODE_TOOLKIT_PRIVACY_LOGS_URL' ) ) {
 	define( 'UNCODE_TOOLKIT_PRIVACY_LOGS_URL', admin_url( 'admin.php?page=uncode-privacy-logs' ) );
@@ -37,6 +37,5 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-uncode-toolkit-privacy-ses
 require plugin_dir_path( __FILE__ ) . 'includes/uncode-toolkit-privacy-logs-functions.php';
 require plugin_dir_path( __FILE__ ) . 'includes/uncode-toolkit-privacy-logs-personal-data.php';
 require plugin_dir_path( __FILE__ ) . 'includes/class-uncode-toolkit-privacy-logs-list-table.php';
-require plugin_dir_path( __FILE__ ) . 'includes/legacy/class-uncode-toolkit-privacy-legacy-tools.php';
 
 new Uncode_Toolkit_Privacy();

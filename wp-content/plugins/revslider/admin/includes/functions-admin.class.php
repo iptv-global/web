@@ -319,7 +319,10 @@ class RevSliderFunctionsAdmin extends RevSliderFunctions {
 
 		$n_discarted = get_option('revslider-notices-dc', array());
 		foreach($notices as $notice){
-			if(in_array($notice->code, $n_discarted)) continue;
+			// BEGIN UNCODE EDIT
+			// if(in_array($notice->code, $n_discarted)) continue;
+			if(!$notice || in_array($notice->code, $n_discarted)) continue;
+			// END UNCODE EDIT
 			if(isset($notice->version) && version_compare($notice->version, RS_REVISION, '<=')) continue;
 			if(isset($notice->registered)){ //if this is set, only show the notice if the plugin state is the same
 				$registered = $this->_truefalse($notice->registered);
